@@ -4,8 +4,11 @@ import RightBar from "@/components/rightbar/app.rightbar";
 import Post from "@/components/post/app.post";
 import Feed from "@/components/feed/app.feed";
 import Grid from "@mui/material/Grid";
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
   return (
     <Box
       sx={{

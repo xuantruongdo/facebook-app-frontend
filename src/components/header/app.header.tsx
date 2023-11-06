@@ -18,6 +18,8 @@ import MessageIcon from "@mui/icons-material/Message";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { Avatar } from "@mui/material";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -60,6 +62,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function AppHeader() {
+  const { data: session } = useSession();
+  console.log(session);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -106,8 +110,19 @@ export default function AppHeader() {
         },
       }}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <Link href={`/profile/${session?.user?._id}`}>
+        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+        
+      </Link>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem
+        onClick={() => {
+          handleMenuClose;
+          signOut();
+        }}
+      >
+        Logout
+      </MenuItem>
     </Menu>
   );
 
@@ -215,17 +230,32 @@ export default function AppHeader() {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            {session ? (
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <Avatar alt="Remy Sharp" src={session?.user?.avatar} />
+              </IconButton>
+            ) : (
+              <IconButton>
+                <Link href="/auth/signin">
+                  <Typography
+                    sx={{
+                      display: { xs: "none", sm: "block" },
+                      color: "white",
+                    }}
+                  >
+                    LOGIN
+                  </Typography>
+                </Link>
+              </IconButton>
+            )}
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton

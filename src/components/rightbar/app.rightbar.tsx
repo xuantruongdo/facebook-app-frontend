@@ -10,7 +10,36 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import Badge from "@mui/material/Badge";
-import green from "@mui/material/colors/green";
+import { styled } from "@mui/material/styles";
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#44b700",
+    color: "#44b700",
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    "&::after": {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      borderRadius: "50%",
+      animation: "ripple 1.2s infinite ease-in-out",
+      border: "1px solid currentColor",
+      content: '""',
+    },
+  },
+  "@keyframes ripple": {
+    "0%": {
+      transform: "scale(.8)",
+      opacity: 1,
+    },
+    "100%": {
+      transform: "scale(2.4)",
+      opacity: 0,
+    },
+  },
+}));
 
 const RightBar = () => {
   return (
@@ -21,7 +50,7 @@ const RightBar = () => {
         borderRadius: "5px",
         marginTop: "20px",
         position: "sticky",
-        top: "70px"
+        top: "70px",
       }}
     >
       <Box>
@@ -119,28 +148,16 @@ const RightBar = () => {
               <ListItem key={value} disablePadding>
                 <ListItemButton>
                   <ListItemAvatar className="avatar">
-                    <Badge
+                    <StyledBadge
                       overlap="circular"
-                      anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "right",
-                      }}
-                      badgeContent={
-                        <div
-                          style={{
-                            background: green[500],
-                            width: 10,
-                            height: 10,
-                            borderRadius: "50%",
-                          }}
-                        />
-                      }
+                      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                      variant="dot"
                     >
                       <Avatar
-                        alt={`Avatar n°${value + 1}`}
-                        src={`/static/images/avatar/${value + 1}.jpg`}
+                        alt="Remy Sharp"
+                        src="/static/images/avatar/1.jpg"
                       />
-                    </Badge>
+                    </StyledBadge>
                   </ListItemAvatar>
                   <ListItemText
                     id={labelId}
