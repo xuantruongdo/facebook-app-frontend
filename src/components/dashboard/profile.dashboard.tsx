@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
@@ -7,21 +8,28 @@ import AvatarGroup from "@mui/material/AvatarGroup";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import MessageIcon from "@mui/icons-material/Message";
+import { useSession } from "next-auth/react";
 
 const ProfileDashboard = () => {
+  const { data: session } = useSession();
+
   return (
     <Box>
-      <Box>
-        <img
-          src="https://assets.goal.com/v3/assets/bltcc7a7ffd2fbf71f5/blt0279bfa2ff61e2bd/60decd948aa56107a9510a9a/3de4c48f50b5b5262df927501658efc25a5118e6.jpg?auto=webp&format=pjpg&width=1080&quality=60"
-          alt="cover"
-          style={{
-            width: "100%",
-            height: "360px",
-            objectFit: "cover",
-            borderRadius: "5px",
-          }}
-        />
+      <Box sx={{ width: "100%", height: "360px", background: "#aaa" }}>
+        {session?.user?.cover ? (
+          <img
+            src={session?.user?.cover}
+            alt="cover"
+            style={{
+              width: "100%",
+              height: "360px",
+              objectFit: "cover",
+              borderRadius: "5px",
+            }}
+          />
+        ) : (
+          ""
+        )}
       </Box>
       <Box
         sx={{
@@ -35,7 +43,7 @@ const ProfileDashboard = () => {
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <img
-            src="https://i1-thethao.vnecdn.net/2023/09/03/ronaldo-850-jpeg-1693687478-1789-1693688039.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=oVyO5GsTPBtA8hXAlX4q0w"
+            src={session?.user?.avatar}
             alt="avatar"
             style={{
               width: "100px",
@@ -49,9 +57,9 @@ const ProfileDashboard = () => {
               <Typography
                 sx={{ fontWeight: "bold", color: "#626262", fontSize: "24px" }}
               >
-                Cristiano Ronaldo
+                {session?.user?.name}
               </Typography>
-              <svg
+              {/* <svg
                 viewBox="0 0 12 13"
                 width="1em"
                 height="1em"
@@ -63,7 +71,7 @@ const ProfileDashboard = () => {
                 <g fill-rule="evenodd" transform="translate(-98 -917)">
                   <path d="m106.853 922.354-3.5 3.5a.499.499 0 0 1-.706 0l-1.5-1.5a.5.5 0 1 1 .706-.708l1.147 1.147 3.147-3.147a.5.5 0 1 1 .706.708m3.078 2.295-.589-1.149.588-1.15a.633.633 0 0 0-.219-.82l-1.085-.7-.065-1.287a.627.627 0 0 0-.6-.603l-1.29-.066-.703-1.087a.636.636 0 0 0-.82-.217l-1.148.588-1.15-.588a.631.631 0 0 0-.82.22l-.701 1.085-1.289.065a.626.626 0 0 0-.6.6l-.066 1.29-1.088.702a.634.634 0 0 0-.216.82l.588 1.149-.588 1.15a.632.632 0 0 0 .219.819l1.085.701.065 1.286c.014.33.274.59.6.604l1.29.065.703 1.088c.177.27.53.362.82.216l1.148-.588 1.15.589a.629.629 0 0 0 .82-.22l.701-1.085 1.286-.064a.627.627 0 0 0 .604-.601l.065-1.29 1.088-.703a.633.633 0 0 0 .216-.819"></path>
                 </g>
-              </svg>
+              </svg> */}
             </Box>
 
             <Typography

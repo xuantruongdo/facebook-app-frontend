@@ -13,11 +13,14 @@ import VideoCallIcon from "@mui/icons-material/VideoCall";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import MoodIcon from "@mui/icons-material/Mood";
 import ModalPost from "./modal.post";
+import { useSession } from "next-auth/react";
 
 const Post = () => {
+  const { data: session } = useSession();
+
   const [open, setOpen] = React.useState<boolean>(false);
   const handleOpen = () => setOpen(true);
-
+  
   return (
     <Box
       sx={{
@@ -29,7 +32,7 @@ const Post = () => {
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Box width="50px">
           <img
-            src="https://i1-thethao.vnecdn.net/2023/09/03/ronaldo-850-jpeg-1693687478-1789-1693688039.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=oVyO5GsTPBtA8hXAlX4q0w"
+            src={session?.user?.avatar}
             alt="avatar"
             style={{
               width: "50px",
@@ -43,7 +46,7 @@ const Post = () => {
           <Typography
             sx={{ marginLeft: "15px", fontWeight: "bold", color: "#626262" }}
           >
-            Cristiano Ronaldo
+            {session?.user?.name}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography
@@ -58,7 +61,7 @@ const Post = () => {
       <Box sx={{ margin: "30px 0 0 50px" }}>
         <TextField
           variant="standard"
-          placeholder="What's on your mind, Cris ?"
+          placeholder={`What's on your mind, ${session?.user?.name} ?`}
           fullWidth
           onClick={handleOpen}
         />

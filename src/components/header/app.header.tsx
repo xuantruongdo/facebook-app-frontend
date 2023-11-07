@@ -19,7 +19,15 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Avatar } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from "@mui/icons-material/Logout";
+import BrowserUpdatedIcon from '@mui/icons-material/BrowserUpdated';
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -63,7 +71,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function AppHeader() {
   const { data: session } = useSession();
-  console.log(session);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -106,24 +113,70 @@ export default function AppHeader() {
       onClose={handleMenuClose}
       PaperProps={{
         style: {
-          width: "200px", // Đặt chiều rộng theo nhu cầu của bạn
+          width: "250px", // Đặt chiều rộng theo nhu cầu của bạn
         },
       }}
     >
-      <Link href={`/profile/${session?.user?._id}`}>
-        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        
+      <Link href={`/profile/${session?.user?._id}`} onClick={handleMenuClose}>
+        <ListItem disablePadding>
+          <ListItemButton>
+            <ListItemIcon>
+              <Avatar alt="avatar" src={session?.user?.avatar} />
+            </ListItemIcon>
+            <ListItemText primary="Do Xuan Truong" />
+          </ListItemButton>{" "}
+        </ListItem>
       </Link>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-      <MenuItem
+      <Divider />
+      <ListItem disablePadding>
+        <ListItemButton>
+          <ListItemIcon>
+            <BrowserUpdatedIcon />
+          </ListItemIcon>
+          <ListItemText primary="Update" />
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton>
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Settings" />
+        </ListItemButton>
+      </ListItem>
+      <ListItem
+        disablePadding
         onClick={() => {
           handleMenuClose;
           signOut();
         }}
       >
-        Logout
-      </MenuItem>
+        <ListItemButton>
+          <ListItemIcon>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItemButton>
+      </ListItem>
     </Menu>
+    //   <List>
+    //   <ListItem disablePadding>
+    //     <ListItemButton>
+    //       <ListItemIcon>
+    //         <InboxIcon />
+    //       </ListItemIcon>
+    //       <ListItemText primary="Inbox" />
+    //     </ListItemButton>
+    //   </ListItem>
+    //   <ListItem disablePadding>
+    //     <ListItemButton>
+    //       <ListItemIcon>
+    //         <DraftsIcon />
+    //       </ListItemIcon>
+    //       <ListItemText primary="Drafts" />
+    //     </ListItemButton>
+    //   </ListItem>
+    // </List>
   );
 
   const mobileMenuId = "primary-search-account-menu-mobile";

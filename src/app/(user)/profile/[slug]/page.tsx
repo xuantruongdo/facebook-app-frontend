@@ -4,8 +4,15 @@ import { Grid } from "@mui/material";
 import Sidebar from "@/components/sidebar/profile.sidebar";
 import Post from "@/components/post/app.post";
 import Feed from "@/components/feed/app.feed";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getServerSession } from "next-auth/next"
+import { redirect } from "next/navigation";
 
-const ProfilePage = () => {
+const ProfilePage = async () => {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+      redirect("/");
+  }
   return (
     <div
       style={{
@@ -31,7 +38,7 @@ const ProfilePage = () => {
           </Grid>
           <Grid item xs={12} md={8}>
             <Post />
-            <Feed/>
+            {/* <Feed/> */}
           </Grid>
         </Grid>
       </Container>

@@ -6,9 +6,16 @@ import Feed from "@/components/feed/app.feed";
 import Grid from "@mui/material/Grid";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../api/auth/[...nextauth]/route";
+import { sendRequest } from "@/utils/api";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
+  
+  const posts = await sendRequest<IBackendRes<IPost[]>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
+    method: "GET",
+  })
+
   return (
     <Box
       sx={{
@@ -23,8 +30,10 @@ export default async function Home() {
             <LeftBar />
           </Grid>
           <Grid item md={6}>
-            <Post />
-            <Feed />
+            {
+              session ? <Post /> : <></>
+            }
+            <Feed posts={ posts?.data! } />
           </Grid>
           <Grid item md={3} className="right-bar">
             <RightBar />
