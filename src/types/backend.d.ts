@@ -49,4 +49,18 @@ declare global {
     createdAt: string;
     upDatedAt: string;
   }
+
+  interface IUser {
+    _id: string;
+    email: string;
+    name: string;
+    avatar: string;
+    cover: string;
+    role: string;
+    isActive: boolean,
+    type: string;
+    isDeleted: false,
+    createdAt: string;
+    updatedAt: string;
+  }
 }

@@ -16,6 +16,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MessageIcon from "@mui/icons-material/Message";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import GroupIcon from "@mui/icons-material/Group";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
@@ -25,9 +26,11 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import BrowserUpdatedIcon from '@mui/icons-material/BrowserUpdated';
+import BrowserUpdatedIcon from "@mui/icons-material/BrowserUpdated";
+import { useRouter } from "next/navigation";
+import { convertSlugUrl } from "@/utils/api";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -71,6 +74,20 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function AppHeader() {
   const { data: session } = useSession();
+  console.log(session);
+
+  if (session && session.error === "RefreshAccessTokenError") {
+    // Session đã được kiểm tra và có lỗi, thực hiện xử lý tại đây
+    // Ví dụ: Chuyển về trang đăng nhập và đặt session thành null
+
+    // Sử dụng next/router để chuyển hướng đến trang đăng nhập
+    const router = useRouter();
+    router.push("/login");
+
+    // Đặt session thành null
+    signOut({ callbackUrl: "/auth/signin" });
+  }
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -95,6 +112,10 @@ export default function AppHeader() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const logout = async () => {
+    handleMenuClose;
+    signOut();
+  };
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -117,7 +138,12 @@ export default function AppHeader() {
         },
       }}
     >
-      <Link href={`/profile/${session?.user?._id}`} onClick={handleMenuClose}>
+      <Link
+        href={`/profile/${convertSlugUrl(session?.user?.name!)}-${
+          session?.user._id
+        }.html`}
+        onClick={handleMenuClose}
+      >
         <ListItem disablePadding>
           <ListItemButton>
             <ListItemIcon>
@@ -144,13 +170,7 @@ export default function AppHeader() {
           <ListItemText primary="Settings" />
         </ListItemButton>
       </ListItem>
-      <ListItem
-        disablePadding
-        onClick={() => {
-          handleMenuClose;
-          signOut();
-        }}
-      >
+      <ListItem disablePadding onClick={logout}>
         <ListItemButton>
           <ListItemIcon>
             <LogoutIcon />
@@ -159,24 +179,6 @@ export default function AppHeader() {
         </ListItemButton>
       </ListItem>
     </Menu>
-    //   <List>
-    //   <ListItem disablePadding>
-    //     <ListItemButton>
-    //       <ListItemIcon>
-    //         <InboxIcon />
-    //       </ListItemIcon>
-    //       <ListItemText primary="Inbox" />
-    //     </ListItemButton>
-    //   </ListItem>
-    //   <ListItem disablePadding>
-    //     <ListItemButton>
-    //       <ListItemIcon>
-    //         <DraftsIcon />
-    //       </ListItemIcon>
-    //       <ListItemText primary="Drafts" />
-    //     </ListItemButton>
-    //   </ListItem>
-    // </List>
   );
 
   const mobileMenuId = "primary-search-account-menu-mobile";
@@ -196,6 +198,14 @@ export default function AppHeader() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
+      <MenuItem>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Badge badgeContent={4} color="error">
+            <GroupIcon />
+          </Badge>
+        </IconButton>
+        <p>Friends</p>
+      </MenuItem>
       <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
@@ -251,7 +261,7 @@ export default function AppHeader() {
               component="div"
               sx={{ display: { xs: "none", sm: "block", fontWeight: "bold" } }}
             >
-              FACEBOOK
+              FACENET
             </Typography>
           </Link>
           <Search>
@@ -265,6 +275,15 @@ export default function AppHeader() {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <IconButton
+              size="large"
+              aria-label="show 4 new mails"
+              color="inherit"
+            >
+              <Badge badgeContent={4} color="error">
+                <GroupIcon />
+              </Badge>
+            </IconButton>
             <IconButton
               size="large"
               aria-label="show 4 new mails"

@@ -20,7 +20,7 @@ const Post = () => {
 
   const [open, setOpen] = React.useState<boolean>(false);
   const handleOpen = () => setOpen(true);
-  
+
   return (
     <Box
       sx={{
@@ -95,7 +95,7 @@ const Post = () => {
         </Box>
       </Box>
 
-      <ModalPost open={open} setOpen={setOpen}/>
+      <ModalPost open={open} setOpen={setOpen} />
     </Box>
   );
 };

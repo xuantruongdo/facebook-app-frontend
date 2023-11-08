@@ -13,8 +13,10 @@ import List from "@mui/material/List";
 import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { sendRequest } from "@/utils/api";
+import { convertSlugUrl, sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "react-toastify";
 dayjs.extend(relativeTime);
 
 const style = {
@@ -47,6 +49,35 @@ const ModalFeed = (props: IProps) => {
 
   const handleClose = () => setOpen(false);
 
+  const notify = (message: string) =>
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  const handleLike = async (id: string) => {
+    const res = await sendRequest<IBackendRes<IPost>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/like/${id}`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
+
+    if (res && res.data) {
+      router.refresh();
+      setPostView(res.data);
+    } else {
+      notify(res?.message);
+    }
+  };
+
   const handleSubmit = async (id: string) => {
     const res = await sendRequest<IBackendRes<IPost>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments/${id}`,
@@ -63,6 +94,8 @@ const ModalFeed = (props: IProps) => {
       router.refresh();
       setPostView(res.data);
       setContent("");
+    } else {
+      notify(res?.message);
     }
   };
 
@@ -139,9 +172,20 @@ const ModalFeed = (props: IProps) => {
               </Typography>
               <Box sx={{ margin: "10px 0 20px", display: "flex", gap: "20px" }}>
                 <Chip
-                  icon={<FavoriteIcon color="error" />}
+                  icon={
+                    <FavoriteIcon
+                      color={`${
+                        postView?.likes?.some(
+                          (t) => t._id === session?.user?._id
+                        )
+                          ? "error"
+                          : "disabled"
+                      }`}
+                    />
+                  }
                   label="Like"
                   sx={{ cursor: "pointer" }}
+                  onClick={() => handleLike(postView?._id)}
                 />
                 <Chip
                   icon={<CommentIcon />}
@@ -150,16 +194,19 @@ const ModalFeed = (props: IProps) => {
                 />
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <img
-                  src={session?.user?.avatar}
-                  alt="avatar"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
-                />
+                {session && (
+                  <img
+                    src={session?.user?.avatar}
+                    alt="avatar"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                )}
+
                 <TextField
                   variant="standard"
                   fullWidth
@@ -178,38 +225,52 @@ const ModalFeed = (props: IProps) => {
                 className="list-cmt"
               >
                 {postView?.comments?.map((cmt) => (
-                  <Box sx={{ marginTop: "20px" }} key={cmt?._id}>
+                  <Box sx={{ marginTop: "20px", width: "100%" }} key={cmt?._id}>
                     <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
                         gap: "20px",
+                        width: "100%",
                       }}
                     >
-                      <img
-                        src={cmt?.user?.avatar}
-                        alt="avatar"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
+                      <Link
+                        href={`/profile/${convertSlugUrl(cmt?.user?.name)}-${
+                          cmt?.user?._id
+                        }.html`}
+                      >
+                        <img
+                          src={cmt?.user?.avatar}
+                          alt="avatar"
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Link>
                       <Box>
-                        <Typography
-                          sx={{ fontSize: "14px", fontWeight: "bold" }}
+                        <Link
+                          href={`/profile/${convertSlugUrl(cmt?.user?.name)}-${
+                            cmt?.user?._id
+                          }.html`}
                         >
-                          {cmt?.user?.name}
+                          {" "}
+                          <Typography
+                            sx={{ fontSize: "14px", fontWeight: "bold" }}
+                          >
+                            {cmt?.user?.name}
+                          </Typography>
+                        </Link>
+
+                        <Typography sx={{ fontSize: "12px" }}>
+                          {cmt?.content}
                         </Typography>
-                        <Box sx={{ display: "flex", gap: "50px" }}>
-                          <Typography sx={{ fontSize: "12px" }}>
-                            {cmt?.content}
-                          </Typography>
-                          <Typography sx={{ fontSize: "12px", color: "gray" }}>
-                            {dayjs(cmt?.createdAt).fromNow()}
-                          </Typography>
-                        </Box>
+
+                        <Typography sx={{ fontSize: "10px", color: "gray" }}>
+                          {dayjs(cmt?.createdAt).fromNow()}
+                        </Typography>
                       </Box>
                     </Box>
                   </Box>

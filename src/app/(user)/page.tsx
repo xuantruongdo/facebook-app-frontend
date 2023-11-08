@@ -10,7 +10,6 @@ import { sendRequest } from "@/utils/api";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
-  
   const posts = await sendRequest<IBackendRes<IPost[]>>({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
     method: "GET",

@@ -10,11 +10,12 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import ModalFeed from "./modal.feed";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { convertSlugUrl, sendRequest } from "@/utils/api";
+import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useSession } from "next-auth/react";
-import { sendRequest } from "@/utils/api";
-import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 dayjs.extend(relativeTime);
 
 interface IProps {
@@ -33,6 +34,17 @@ const Feed = (props: IProps) => {
     setPostView(post);
   };
 
+  const notify = (message: string) =>
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
 
   const handleLike = async (id: string) => {
     const res = await sendRequest<IBackendRes<IPost>>({
@@ -42,9 +54,13 @@ const Feed = (props: IProps) => {
         Authorization: `Bearer ${session?.access_token}`,
       },
     });
+    console.log(res);
 
     if (res && res.data) {
       router.refresh();
+    }
+    else {
+      notify(res?.message);
     }
   };
 
@@ -67,7 +83,11 @@ const Feed = (props: IProps) => {
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Box width="50px">
-                <Link href={`/profile/${post?.author?._id}`}>
+                <Link
+                  href={`/profile/${convertSlugUrl(post?.author?.name!)}-${
+                    post?.author?._id
+                  }.html`}
+                >
                   <img
                     src={post?.author.avatar}
                     alt="avatar"
@@ -88,7 +108,13 @@ const Feed = (props: IProps) => {
                     color: "#626262",
                   }}
                 >
-                  {post?.author.name}
+                  <Link
+                    href={`/profile/${convertSlugUrl(post?.author?.name!)}-${
+                      post?.author?._id
+                    }.html`}
+                  >
+                    {post?.author.name}
+                  </Link>
                 </Typography>
                 <Typography
                   sx={{
@@ -150,7 +176,13 @@ const Feed = (props: IProps) => {
             </Stack>
           </Box>
 
-          <ModalFeed open={open} setOpen={setOpen} postView={postView!} setPostView={setPostView} openView={openView} />
+          <ModalFeed
+            open={open}
+            setOpen={setOpen}
+            postView={postView!}
+            setPostView={setPostView}
+            openView={openView}
+          />
         </Box>
       ))}
     </>

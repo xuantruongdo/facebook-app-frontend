@@ -7,32 +7,39 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import { ArrowBack, Visibility, VisibilityOff } from "@mui/icons-material";
 import LockPersonIcon from "@mui/icons-material/LockPerson";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import GoogleIcon from "@mui/icons-material/Google";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { sendRequest } from "@/utils/api";
 
-const AuthSignIn = () => {
+const AuthSignUp = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
 
-  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
 
-  const [isErrorUsername, setIsErrorUsername] = useState<boolean>(false);
+  const [isErrorEmail, setIsErrorEmail] = useState<boolean>(false);
+  const [isErrorName, setIsErrorName] = useState<boolean>(false);
   const [isErrorPassword, setIsErrorPassword] = useState<boolean>(false);
+  const [isErrorConfirmPassword, setIsErrorConfirmPassword] =
+    useState<boolean>(false);
 
-  const [errorUsername, setErrorUsername] = useState<string>("");
+  const [errorEmail, setErrorEmail] = useState<string>("");
+  const [errorName, setErrorName] = useState<string>("");
   const [errorPassword, setErrorPassword] = useState<string>("");
+  const [errorConfirmPassword, setErrorConfirmPassword] = useState<string>("");
 
   const router = useRouter();
-  const notify = (message: string) =>
+  const notifyError = (message: string) =>
     toast.error(message, {
       position: "top-right",
       autoClose: 3000,
@@ -44,15 +51,39 @@ const AuthSignIn = () => {
       theme: "light",
     });
 
-  const handleSubmit = async () => {
-    setIsErrorUsername(false);
-    setIsErrorPassword(false);
-    setErrorUsername("");
-    setErrorPassword("");
+  const notifySuccess = (message: string) =>
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
 
-    if (!username) {
-      setIsErrorUsername(true);
-      setErrorUsername("Username is not empty");
+  const handleSubmit = async () => {
+    console.log(email, name, password, confirmPassword);
+    setIsErrorEmail(false);
+    setIsErrorName(false);
+    setIsErrorPassword(false);
+    setIsErrorConfirmPassword(false);
+
+    setErrorEmail("");
+    setErrorName("");
+    setErrorPassword("");
+    setErrorConfirmPassword("");
+
+    if (!email) {
+      setIsErrorEmail(true);
+      setErrorEmail("Email is not empty");
+      return;
+    }
+
+    if (!name) {
+      setIsErrorName(true);
+      setErrorName("Name is not empty");
       return;
     }
 
@@ -62,16 +93,36 @@ const AuthSignIn = () => {
       return;
     }
 
-    const res = await signIn("credentials", {
-      username: username,
-      password: password,
-      redirect: false,
-    });
+    if (!confirmPassword) {
+      setIsErrorConfirmPassword(true);
+      setErrorConfirmPassword("Confirm password is not empty");
+      return;
+    }
 
-    if (res && !res.error) {
-      router.push("/");
+    if (password === confirmPassword) {
+      const res = await sendRequest<IBackendRes<IUser>>({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/register`,
+        method: "POST",
+        body: {
+          email: email,
+          name: name,
+          password: password,
+        },
+      });
+
+      if (res && res.data) {
+        const resLogin = await signIn("credentials", {
+          username: email,
+          password: password,
+          redirect: false,
+        });
+        if (resLogin && !resLogin.error) {
+          router.push("/");
+          notifySuccess("Sign up successfully");
+        }
+      }
     } else {
-      notify(res?.error!);
+      notifyError("Password and Confirm password do not match");
     }
   };
   return (
@@ -120,20 +171,34 @@ const AuthSignIn = () => {
               <Avatar>
                 <LockPersonIcon />
               </Avatar>
-              <Typography component={"h1"}>Sign in</Typography>
+              <Typography component={"h1"}>Sign Up</Typography>
             </Box>
 
             <TextField
+              type="email"
               variant="outlined"
               margin="normal"
               required
               fullWidth
-              placeholder="Username"
-              name="username"
+              placeholder="Email"
+              name="email"
               autoFocus
-              onChange={(e) => setUsername(e.target.value)}
-              error={isErrorUsername}
-              helperText={errorUsername}
+              onChange={(e) => setEmail(e.target.value)}
+              error={isErrorEmail}
+              helperText={errorEmail}
+            />
+            <TextField
+              type="text"
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              placeholder="Name"
+              name="name"
+              autoFocus
+              onChange={(e) => setName(e.target.value)}
+              error={isErrorName}
+              helperText={errorName}
             />
             <TextField
               variant="outlined"
@@ -147,21 +212,43 @@ const AuthSignIn = () => {
               onChange={(e) => setPassword(e.target.value)}
               error={isErrorPassword}
               helperText={errorPassword}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSubmit();
-                }
-              }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
                       onClick={() => setShowPassword(!showPassword)}
-                      // onMouseDown={handleMouseDownPassword}
                       edge="end"
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              placeholder="Confirm password"
+              name="confirm_password"
+              autoFocus
+              type={showConfirmPassword ? "text" : "password"}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={isErrorConfirmPassword}
+              helperText={errorConfirmPassword}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -177,39 +264,17 @@ const AuthSignIn = () => {
               color="primary"
               onClick={handleSubmit}
             >
-              Sign In
+              Sign Up
             </Button>
             <Typography sx={{ marginBottom: "20px", textAlign: "center" }}>
-              Do not have an account ?
+              Do you already have an account ?
               <Link
-                href={"/auth/signup"}
+                href={"/auth/signin"}
                 style={{ marginLeft: "10px", color: "#1976D2" }}
               >
-                Sign up
+                Sign in
               </Link>
             </Typography>
-            <Divider>Or using</Divider>
-            <Box
-              sx={{
-                display: "flex",
-                gap: "25px",
-                justifyContent: "center",
-                mt: 3,
-              }}
-            >
-              <Avatar
-                sx={{ cursor: "pointer", bgcolor: "black" }}
-                onClick={() => signIn("github")}
-              >
-                <GitHubIcon titleAccess="Login with Github" />
-              </Avatar>
-              <Avatar
-                sx={{ cursor: "pointer", bgcolor: "#E34033" }}
-                onClick={() => signIn("google")}
-              >
-                <GoogleIcon titleAccess="Login with Google" />
-              </Avatar>
-            </Box>
           </div>
         </Grid>
       </Grid>
@@ -217,4 +282,4 @@ const AuthSignIn = () => {
   );
 };
 
-export default AuthSignIn;
+export default AuthSignUp;
