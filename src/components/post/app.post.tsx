@@ -14,6 +14,7 @@ import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import MoodIcon from "@mui/icons-material/Mood";
 import ModalPost from "./modal.post";
 import { useSession } from "next-auth/react";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 const Post = () => {
   const { data: session } = useSession();
@@ -27,6 +28,7 @@ const Post = () => {
         padding: "20px",
         background: "white",
         borderRadius: "5px",
+        marginBottom: "20px"
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -43,11 +45,17 @@ const Post = () => {
           />
         </Box>
         <Box>
-          <Typography
-            sx={{ marginLeft: "15px", fontWeight: "bold", color: "#626262" }}
-          >
-            {session?.user?.name}
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Typography
+              sx={{ marginLeft: "15px", fontWeight: "bold", color: "#626262" }}
+            >
+              {session?.user?.name}
+            </Typography>
+            {session?.user?.isActive && (
+              <VerifiedIcon color="primary" sx={{ fontSize: "16px" }} />
+            )}
+          </Box>
+
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography
               sx={{ marginLeft: "15px", fontSize: "12px", color: "#626262" }}

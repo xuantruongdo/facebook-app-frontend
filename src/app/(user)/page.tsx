@@ -28,7 +28,7 @@ export default async function Home() {
           <Grid item md={3} className="left-bar">
             <LeftBar />
           </Grid>
-          <Grid item md={6}>
+          <Grid item md={6} sx={{marginTop: "20px"}}>
             {
               session ? <Post /> : <></>
             }

@@ -25,6 +25,7 @@ declare global {
       name: string;
       email: string;
       avatar: string;
+      isActive: boolean;
     };
     content: string;
     image: string;
@@ -33,6 +34,7 @@ declare global {
       name: string;
       email: string;
       avatar: string;
+      isActive: boolean;
     }[];
     comments: {
       _id: string;
@@ -41,6 +43,7 @@ declare global {
         name: string;
         email: string;
         avatar: string;
+        isActive: boolean;
       };
         content: string;
         createdAt: string;
@@ -57,8 +60,14 @@ declare global {
     avatar: string;
     cover: string;
     role: string;
+    note: string;
+    work: string;
+    live: string;
+    from: string;
     isActive: boolean,
     type: string;
+    followers: string[];
+    followings: string[];
     isDeleted: false,
     createdAt: string;
     updatedAt: string;

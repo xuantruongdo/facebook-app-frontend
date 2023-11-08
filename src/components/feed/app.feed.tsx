@@ -8,6 +8,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import ModalFeed from "./modal.feed";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -54,12 +55,10 @@ const Feed = (props: IProps) => {
         Authorization: `Bearer ${session?.access_token}`,
       },
     });
-    console.log(res);
 
     if (res && res.data) {
       router.refresh();
-    }
-    else {
+    } else {
       notify(res?.message);
     }
   };
@@ -68,9 +67,6 @@ const Feed = (props: IProps) => {
     <>
       {posts?.map((post) => (
         <Box
-          sx={{
-            marginTop: "20px",
-          }}
           key={post?._id}
         >
           <Box
@@ -78,7 +74,7 @@ const Feed = (props: IProps) => {
               padding: "20px",
               background: "white",
               borderRadius: "5px",
-              marginTop: "20px",
+              marginBottom: "20px",
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -101,11 +97,11 @@ const Feed = (props: IProps) => {
                 </Link>
               </Box>
               <Box>
-                <Typography
+                <Box
                   sx={{
-                    marginLeft: "15px",
-                    fontWeight: "bold",
-                    color: "#626262",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
                   }}
                 >
                   <Link
@@ -113,9 +109,21 @@ const Feed = (props: IProps) => {
                       post?.author?._id
                     }.html`}
                   >
-                    {post?.author.name}
+                    <Typography
+                      sx={{
+                        marginLeft: "15px",
+                        fontWeight: "bold",
+                        color: "#626262",
+                      }}
+                    >
+                      {post?.author?.name}
+                    </Typography>
                   </Link>
-                </Typography>
+
+                  {post?.author?.isActive && (
+                    <VerifiedIcon color="primary" sx={{ fontSize: "16px" }} />
+                  )}
+                </Box>
                 <Typography
                   sx={{
                     marginLeft: "15px",

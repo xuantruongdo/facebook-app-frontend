@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 import { sendRequest } from "@/utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -37,6 +38,7 @@ const style = {
   boxShadow: 24,
   p: 4,
   borderRadius: "5px",
+  outline: "none"
 };
 
 interface IProps {
@@ -135,15 +137,16 @@ const ModalPost = (props: IProps) => {
             />
           </Box>
           <Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Typography
-              sx={{
-                marginLeft: "15px",
-                fontWeight: "bold",
-                color: "#626262",
-              }}
+              sx={{ marginLeft: "15px", fontWeight: "bold", color: "#626262" }}
             >
               {session?.user?.name}
             </Typography>
+            {session?.user?.isActive && (
+              <VerifiedIcon color="primary" sx={{ fontSize: "16px" }} />
+            )}
+          </Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography
                 sx={{ marginLeft: "15px", fontSize: "12px", color: "#626262" }}

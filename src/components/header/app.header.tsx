@@ -31,6 +31,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import BrowserUpdatedIcon from "@mui/icons-material/BrowserUpdated";
 import { useRouter } from "next/navigation";
 import { convertSlugUrl } from "@/utils/api";
+import { ListItemSecondaryAction } from "@mui/material";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -74,7 +76,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function AppHeader() {
   const { data: session } = useSession();
-  console.log(session);
 
   if (session && session.error === "RefreshAccessTokenError") {
     // Session đã được kiểm tra và có lỗi, thực hiện xử lý tại đây
@@ -149,8 +150,13 @@ export default function AppHeader() {
             <ListItemIcon>
               <Avatar alt="avatar" src={session?.user?.avatar} />
             </ListItemIcon>
-            <ListItemText primary="Do Xuan Truong" />
-          </ListItemButton>{" "}
+            <ListItemText primary={session?.user?.name} />
+            {session?.user?.isActive && (
+              <ListItemSecondaryAction>
+                <VerifiedIcon color="primary" />
+              </ListItemSecondaryAction>
+            )}
+          </ListItemButton>
         </ListItem>
       </Link>
       <Divider />

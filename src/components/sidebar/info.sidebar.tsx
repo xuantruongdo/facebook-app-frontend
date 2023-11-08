@@ -11,8 +11,15 @@ import {
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import HomeIcon from "@mui/icons-material/Home";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import RssFeedIcon from "@mui/icons-material/RssFeed";
 
-const Info = () => {
+interface IProps {
+  user: IUser;
+}
+
+const Info = (props: IProps) => {
+  const { user } = props;
+
   return (
     <Box
       sx={{
@@ -24,44 +31,64 @@ const Info = () => {
       <Typography
         sx={{ fontSize: "18px", fontWeight: "bold", color: "#626262" }}
       >
-        Info{" "}
+        Info
       </Typography>
 
       <Typography
         sx={{ fontSize: "14px", color: "#626262", textAlign: "center" }}
       >
-        I'm the GOAT{" "}
+        {user?.note}
       </Typography>
       <Divider />
       <Box>
         <List>
-          <ListItem disablePadding sx={{ padding: "5px 0" }}>
-            <ListItemIcon>
-              <BusinessCenterIcon />
-            </ListItemIcon>
-            <ListItemText
-              style={{ color: "#696969" }}
-              primary="Work at Al Nassr"
-            />
-          </ListItem>
-          <ListItem disablePadding sx={{ padding: "5px 0" }}>
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText
-              style={{ color: "#696969" }}
-              primary="Lives in Arab Saudi"
-            />
-          </ListItem>
-          <ListItem disablePadding sx={{ padding: "5px 0" }}>
-            <ListItemIcon>
-              <LocationOnIcon />
-            </ListItemIcon>
-            <ListItemText
-              style={{ color: "#696969" }}
-              primary="From Portugal"
-            />
-          </ListItem>
+          {user?.work && (
+            <ListItem disablePadding sx={{ padding: "5px 0" }}>
+              <ListItemIcon>
+                <BusinessCenterIcon />
+              </ListItemIcon>
+              <ListItemText
+                style={{ color: "#696969" }}
+                primary={`Work at ${user?.work}`}
+              />
+            </ListItem>
+          )}
+
+          {user?.live && (
+            <ListItem disablePadding sx={{ padding: "5px 0" }}>
+              <ListItemIcon>
+                <HomeIcon />
+              </ListItemIcon>
+              <ListItemText
+                style={{ color: "#696969" }}
+                primary={`Lives in ${user?.live}`}
+              />
+            </ListItem>
+          )}
+
+          {user?.from && (
+            <ListItem disablePadding sx={{ padding: "5px 0" }}>
+              <ListItemIcon>
+                <LocationOnIcon />
+              </ListItemIcon>
+              <ListItemText
+                style={{ color: "#696969" }}
+                primary={`From ${user?.from}`}
+              />
+            </ListItem>
+          )}
+
+          {user?.followings && (
+            <ListItem disablePadding sx={{ padding: "5px 0" }}>
+              <ListItemIcon>
+                <RssFeedIcon />
+              </ListItemIcon>
+              <ListItemText
+                style={{ color: "#696969" }}
+                primary={`${user?.followings.length} followings`}
+              />
+            </ListItem>
+          )}
         </List>
       </Box>
     </Box>

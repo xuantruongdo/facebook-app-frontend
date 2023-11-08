@@ -20,6 +20,9 @@ const ProfilePage = async (props: any) => {
   const res = await sendRequest<IBackendRes<IUser>>({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/${id}`,
     method: "GET",
+    nextOption: {
+      next: {tags: ['follow-user']}
+    }
   });
 
   const posts = await sendRequest<IBackendRes<IPost[]>>({
@@ -48,7 +51,7 @@ const ProfilePage = async (props: any) => {
           className="profile-wrapper"
         >
           <Grid item xs={0} md={4}>
-            <Sidebar />
+            <Sidebar user={res?.data!}/>
           </Grid>
           <Grid item xs={12} md={8}>
             {

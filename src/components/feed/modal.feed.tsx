@@ -8,6 +8,7 @@ import Modal from "@mui/material/Modal";
 import Grid from "@mui/material/Grid";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import TextField from "@mui/material/TextField";
 import List from "@mui/material/List";
 import { useSession } from "next-auth/react";
@@ -31,6 +32,7 @@ const style = {
   overflow: "hidden",
   p: 4,
   borderRadius: "5px",
+  outline: "none",
 };
 
 interface IProps {
@@ -46,6 +48,7 @@ const ModalFeed = (props: IProps) => {
   const { open, setOpen, postView, setPostView, openView } = props;
   const router = useRouter();
   const [content, setContent] = React.useState<string>("");
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const handleClose = () => setOpen(false);
 
@@ -142,15 +145,33 @@ const ModalFeed = (props: IProps) => {
                   />
                 </Box>
                 <Box>
-                  <Typography
+                  <Box
                     sx={{
-                      marginLeft: "15px",
-                      fontWeight: "bold",
-                      color: "#626262",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
                     }}
                   >
-                    {postView?.author?.name}
-                  </Typography>
+                    <Link
+                      href={`/profile/${convertSlugUrl(
+                        postView?.author?.name!
+                      )}-${postView?.author?._id}.html`}
+                    >
+                      <Typography
+                        sx={{
+                          marginLeft: "15px",
+                          fontWeight: "bold",
+                          color: "#626262",
+                        }}
+                      >
+                        {postView?.author?.name}
+                      </Typography>
+                    </Link>
+
+                    {postView?.author?.isActive && (
+                      <VerifiedIcon color="primary" sx={{ fontSize: "16px" }} />
+                    )}
+                  </Box>
                   <Typography
                     sx={{
                       marginLeft: "15px",
@@ -187,10 +208,16 @@ const ModalFeed = (props: IProps) => {
                   sx={{ cursor: "pointer" }}
                   onClick={() => handleLike(postView?._id)}
                 />
+
                 <Chip
                   icon={<CommentIcon />}
                   label="Comment"
                   sx={{ cursor: "pointer" }}
+                  onClick={() => {
+                    if (inputRef.current) {
+                      inputRef.current.focus();
+                    }
+                  }}
                 />
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -208,6 +235,7 @@ const ModalFeed = (props: IProps) => {
                 )}
 
                 <TextField
+                  id="comment_post"
                   variant="standard"
                   fullWidth
                   value={content}
@@ -217,6 +245,7 @@ const ModalFeed = (props: IProps) => {
                       handleSubmit(postView?._id);
                     }
                   }}
+                  inputRef={inputRef}
                 />
               </Box>
 
@@ -251,18 +280,32 @@ const ModalFeed = (props: IProps) => {
                         />
                       </Link>
                       <Box>
-                        <Link
-                          href={`/profile/${convertSlugUrl(cmt?.user?.name)}-${
-                            cmt?.user?._id
-                          }.html`}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
                         >
-                          {" "}
-                          <Typography
-                            sx={{ fontSize: "14px", fontWeight: "bold" }}
+                          <Link
+                            href={`/profile/${convertSlugUrl(
+                              cmt?.user?.name!
+                            )}-${cmt?.user?._id}.html`}
                           >
-                            {cmt?.user?.name}
-                          </Typography>
-                        </Link>
+                            <Typography
+                              sx={{ fontSize: "14px", fontWeight: "bold" }}
+                            >
+                              {cmt?.user?.name}
+                            </Typography>
+                          </Link>
+
+                          {cmt?.user?.isActive && (
+                            <VerifiedIcon
+                              color="primary"
+                              sx={{ fontSize: "16px" }}
+                            />
+                          )}
+                        </Box>
 
                         <Typography sx={{ fontSize: "12px" }}>
                           {cmt?.content}
