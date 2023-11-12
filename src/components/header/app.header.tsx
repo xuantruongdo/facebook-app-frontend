@@ -31,8 +31,20 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import BrowserUpdatedIcon from "@mui/icons-material/BrowserUpdated";
 import { useRouter } from "next/navigation";
 import { convertSlugUrl } from "@/utils/api";
-import { ListItemSecondaryAction } from "@mui/material";
+import List from "@mui/material/List";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import { Button, ListItemSecondaryAction } from "@mui/material";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import { useUserContext } from "@/app/lib/user.context";
+import { useHasMounted } from "@/utils/customHook";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import CommentIcon from '@mui/icons-material/Comment';
+import RssFeedIcon from '@mui/icons-material/RssFeed';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+import io, { Socket } from "socket.io-client";
+const ENDPOINT = "http://localhost:8002";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -77,6 +89,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function AppHeader() {
   const { data: session } = useSession();
 
+  const { onlineUsers, setOnlineUsers } = useUserContext() as IUserContext;
+
   if (session && session.error === "RefreshAccessTokenError") {
     // Session đã được kiểm tra và có lỗi, thực hiện xử lý tại đây
     // Ví dụ: Chuyển về trang đăng nhập và đặt session thành null
@@ -92,9 +106,51 @@ export default function AppHeader() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
+  const [notiAnchorEl, setNotiAnchorEl] = React.useState<null | HTMLElement>(
+    null
+  );
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const hasMounted = useHasMounted();
+  const [socket, setSocket] = React.useState<Socket>();
+  const [notifications, setNotifications] = React.useState<
+    INotification[] | []
+  >([]);
+
+  React.useEffect(() => {
+    if (session) {
+      const newSocket = io(ENDPOINT, {
+        query: { userId: session?.user._id },
+      });
+      setSocket(newSocket);
+
+      return () => {
+        if (newSocket) {
+          newSocket.disconnect();
+        }
+      };
+    }
+  }, [session]);
+
+  React.useEffect(() => {
+    socket?.on("onlineUsers", (usersArray) => {
+      setOnlineUsers(usersArray); // Update state with the received online users
+    });
+
+    socket?.on(`noti_${session?.user?._id}`, (notification) => {
+      if (!hasMounted) return <></>;
+      setNotifications((prev: any) => [notification, ...prev]);
+
+      // if (notification?.post?.author?._id === session?.user?._id) {
+      //   setNotifications((prev: any) => [notification, ...prev]);
+      // }
+    });
+
+    //@ts-ignore
+    socket?.emit("getOnlineUsers", session?.id);
+  }, [socket, session]);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -111,6 +167,14 @@ export default function AppHeader() {
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseNoti = () => {
+    setNotiAnchorEl(null);
+  };
+
+  const handleOpenNoti = (event: React.MouseEvent<HTMLElement>) => {
+    setNotiAnchorEl(event.currentTarget);
   };
 
   const logout = async () => {
@@ -247,6 +311,91 @@ export default function AppHeader() {
     </Menu>
   );
 
+  const renderNotification = (
+    <Menu
+      anchorEl={notiAnchorEl}
+      open={Boolean(notiAnchorEl)}
+      onClose={handleCloseNoti}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      PaperProps={{
+        style: {
+          width: "400px", // Đặt chiều rộng theo nhu cầu của bạn
+        },
+      }}
+    >
+      <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+        {notifications.length > 0 ? (
+          notifications?.map((noti, index) => (
+            <ListItem key={index} alignItems="center" disablePadding>
+              <ListItemButton>
+                <ListItemAvatar>
+                  <Avatar alt={noti?.sender?.name} src={noti?.sender?.avatar} />
+                </ListItemAvatar>
+                <ListItemText
+                  sx={{ width: "100px" }}
+                  primary={noti?.message}
+                  secondary={
+                    <React.Fragment>
+                      <Typography
+                        sx={{
+                          display: "block",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                        }}
+                        component="span"
+                        variant="body2"
+                        color="#555555"
+                      >
+                        {noti?.post?.content}
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          display: "inline",
+                          fontSize: "12px",
+                        }}
+                        component="span"
+                      >
+                        {dayjs(noti?.createdAt).fromNow()}
+                      </Typography>
+                    </React.Fragment>
+                  }
+                />
+                {
+                  noti?.type === "like" && <FavoriteIcon color="error" />
+                }
+                {
+                  noti?.type === "comment" && <CommentIcon color="success"/>
+                }
+                {
+                  noti?.type === "follow" && <RssFeedIcon color="primary"/>
+                }
+              </ListItemButton>
+            </ListItem>
+          ))
+        ) : (
+          <Typography sx={{textAlign: 'center'}}>No data...</Typography>
+        )}
+      </List>
+      <Box
+        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+      >
+        <Button variant="outlined" onClick={() => setNotifications([])}>
+          Read All
+        </Button>
+      </Box>
+    </Menu>
+  );
+
   return (
     <Box sx={{ flexGrow: 1, position: "fixed", width: "100%", zIndex: 999 }}>
       <AppBar position="static">
@@ -280,31 +429,39 @@ export default function AppHeader() {
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <GroupIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <MessageIcon />
-              </Badge>
-            </IconButton>
+          <Box
+            sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
+          >
+            <Link href={"/"}>
+              <IconButton
+                size="large"
+                aria-label="show 4 new mails"
+                color="inherit"
+              >
+                <Badge badgeContent={4} color="error">
+                  <GroupIcon />
+                </Badge>
+              </IconButton>
+            </Link>
+            <Link href={"/chat"}>
+              <IconButton
+                size="large"
+                aria-label="show 4 new mails"
+                color="inherit"
+              >
+                <Badge badgeContent={4} color="error">
+                  <MessageIcon />
+                </Badge>
+              </IconButton>
+            </Link>
+
             <IconButton
               size="large"
               aria-label="show 17 new notifications"
               color="inherit"
+              onClick={(e) => handleOpenNoti(e)}
             >
-              <Badge badgeContent={17} color="error">
+              <Badge badgeContent={notifications?.length} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -351,6 +508,7 @@ export default function AppHeader() {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
+      {renderNotification}
     </Box>
   );
 }

@@ -14,10 +14,12 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { convertSlugUrl, sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { toast } from "react-toastify";
 dayjs.extend(relativeTime);
+import { useUserContext } from "@/app/lib/user.context";
+
 
 interface IProps {
   posts: IPost[];
@@ -27,7 +29,8 @@ const Feed = (props: IProps) => {
   const { data: session } = useSession();
   const [open, setOpen] = React.useState<boolean>(false);
   const [postView, setPostView] = React.useState<IPost>();
-  const router = useRouter();
+  const router = useRouter()
+  const {socket, setSocket} = useUserContext() as IUserContext
 
   const handleOpen = () => setOpen(true);
 
@@ -47,28 +50,33 @@ const Feed = (props: IProps) => {
       theme: "light",
     });
 
-  const handleLike = async (id: string) => {
-    const res = await sendRequest<IBackendRes<IPost>>({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/like/${id}`,
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${session?.access_token}`,
-      },
-    });
+  const handleLike = async (id: string, isLike: boolean) => {
+    try {
+      const res = await sendRequest<IBackendRes<IPost>>({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/like/${id}`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
 
-    if (res && res.data) {
-      router.refresh();
-    } else {
-      notify(res?.message);
+      if (res && res.data) {
+        router.refresh();
+        if (!isLike && res?.data?.author?._id !== session?.user?._id) {
+          socket?.emit("like", { sender: session?.user, post: res?.data, type: "like", createdAt: new Date() });
+        }
+      } else {
+        notify(res?.message);
+      }
+    } catch (error) {
+      console.error("Error while handling like:", error);
     }
   };
 
   return (
     <>
       {posts?.map((post) => (
-        <Box
-          key={post?._id}
-        >
+        <Box key={post?._id}>
           <Box
             sx={{
               padding: "20px",
@@ -154,7 +162,14 @@ const Feed = (props: IProps) => {
               )}
             </Box>
             <Stack direction="row" spacing={1} sx={{ marginTop: "10px" }}>
-              <Button onClick={() => handleLike(post?._id)}>
+              <Button
+                onClick={() =>
+                  handleLike(
+                    post?._id,
+                    post?.likes?.some((t) => t._id === session?.user?._id)
+                  )
+                }
+              >
                 <Chip
                   icon={
                     <FavoriteIcon

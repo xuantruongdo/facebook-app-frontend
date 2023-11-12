@@ -6,7 +6,6 @@ import Post from "@/components/post/app.post";
 import Feed from "@/components/feed/app.feed";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth/next"
-import { redirect } from "next/navigation";
 import { sendRequest } from "@/utils/api";
 
 const ProfilePage = async (props: any) => {

@@ -45,8 +45,8 @@ declare global {
         avatar: string;
         isActive: boolean;
       };
-        content: string;
-        createdAt: string;
+      content: string;
+      createdAt: string;
     }[];
     isDeleted: boolean;
     createdAt: string;
@@ -64,12 +64,58 @@ declare global {
     work: string;
     live: string;
     from: string;
-    isActive: boolean,
+    isActive: boolean;
     type: string;
     followers: string[];
     followings: string[];
-    isDeleted: false,
+    isDeleted: false;
     createdAt: string;
     updatedAt: string;
+  }
+  interface IChat {
+    _id: string;
+    chatName: string;
+    isGroupChat: boolean;
+    users: IUser[];
+    isDeleted: false;
+    createdAt: string;
+    updatedAt: string;
+    latestMessage: {
+      _id: string;
+      content: string;
+      sender: IUser;
+    };
+  }
+
+  interface IMessage {
+    _id: string;
+    content: string;
+    sender: IUser;
+    chat: IChat;
+    isDeleted: false;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  interface IChatContext {
+    chats: any;
+    setChats: (v: any) => void;
+    selectedChat: any;
+    setSelectedChat: (v: any) => void;
+  }
+
+  interface IUserContext {
+    onlineUsers: any;
+    setOnlineUsers: (v: any) => void;
+    socket: any;
+    setSocket: (v: any) => void;
+  }
+
+  interface INotification {
+    sender: IUser;
+    message: string;
+    post?: IPost;
+    type: string;
+    createdAt: string;
   }
 }

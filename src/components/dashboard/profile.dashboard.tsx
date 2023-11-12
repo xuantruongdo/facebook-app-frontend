@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import { sendRequest } from "@/utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useUserContext } from "@/app/lib/user.context";
 
 interface IProps {
   user: IUser;
@@ -21,6 +22,7 @@ const ProfileDashboard = (props: IProps) => {
   const { user } = props;
   const { data: session } = useSession();
   const [currentUser, setCurrentUser] = React.useState<IUser>();
+  const { socket, setSocket } = useUserContext() as IUserContext;
   const router = useRouter();
 
   const fetchCurrentUser = async () => {
@@ -28,8 +30,8 @@ const ProfileDashboard = (props: IProps) => {
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/${session?.user?._id}`,
       method: "GET",
       nextOption: {
-        next: {tags: ['follow-user']}
-      }
+        next: { tags: ["follow-user"] },
+      },
     });
 
     if (res && res.data) {
@@ -53,15 +55,14 @@ const ProfileDashboard = (props: IProps) => {
       theme: "light",
     });
 
-  const handleFollow = async () => {
+  const handleFollow = async (isFollow: boolean) => {
     const res = await sendRequest<IBackendRes<IUser>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/follow/${user?._id}`,
       method: "POST",
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
-      }
+      },
     });
-
 
     if (res && res.data) {
       await sendRequest<IBackendRes<any>>({
@@ -69,17 +70,23 @@ const ProfileDashboard = (props: IProps) => {
         method: "GET",
         queryParams: {
           tag: "follow-user",
-          secret:"truongdo"
-        }
-      })
+          secret: "truongdo",
+        },
+      });
       router.refresh();
-      fetchCurrentUser()
+      fetchCurrentUser();
+      if (!isFollow) {
+        socket?.emit("follow", {
+          sender: session?.user,
+          post: {author: user},
+          type: "follow",
+          createdAt: new Date(),
+        });
+      }
     } else {
       notify(res?.message);
     }
-
-
-  }
+  };
   return (
     <Box>
       <Box sx={{ width: "100%", height: "360px", background: "#aaa" }}>
@@ -147,12 +154,26 @@ const ProfileDashboard = (props: IProps) => {
           <Box>
             <Box className="button-wrapper">
               {currentUser?.followings?.some((id) => id === user?._id) ? (
-                <Button variant="outlined" onClick={handleFollow}>
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    handleFollow(
+                      currentUser?.followings?.some((id) => id === user?._id)!
+                    )
+                  }
+                >
                   <RemoveIcon />
                   Unfollow
                 </Button>
               ) : (
-                <Button variant="outlined" onClick={handleFollow}>
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    handleFollow(
+                      currentUser?.followings?.some((id) => id === user?._id)!
+                    )
+                  }
+                >
                   <AddIcon />
                   Follow
                 </Button>

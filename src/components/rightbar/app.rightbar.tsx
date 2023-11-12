@@ -11,6 +11,11 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
+import { useUserContext } from "@/app/lib/user.context";
+import { sendRequest } from "@/utils/api";
+import { useSession } from "next-auth/react";
+import { useChatContext } from "@/app/lib/chat.context";
+import { useRouter } from "next/navigation";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -42,6 +47,48 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 const RightBar = () => {
+  const { data: session } = useSession();
+  const { onlineUsers, setOnlineUsers } = useUserContext() as IUserContext;
+  const { chats, setChats, selectedChat, setSelectedChat } =
+    useChatContext() as IChatContext;
+  const router = useRouter();
+  const [onlineInfo, setOnlineInfo] = React.useState<IUser[]>();
+
+  const fetchOnlineUsers = async () => {
+    const res = await sendRequest<IBackendRes<IUser[]>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/find-all-with-id`,
+      method: "POST",
+      body: {
+        ids: onlineUsers,
+      },
+    });
+
+    if (res && res?.data) {
+      setOnlineInfo(res.data);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchOnlineUsers();
+  }, [onlineUsers]);
+
+  const handleAccess = async (receivedId: string) => {
+    const res = await sendRequest<IBackendRes<IChat[]>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/chats`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+      body: { receivedId: receivedId },
+    });
+
+    if (res && res.data) {
+      router.refresh();
+      router.push('/chat');
+      setSelectedChat(res.data);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -140,12 +187,19 @@ const RightBar = () => {
         </Box>
         <List
           dense
-          sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+          sx={{
+            width: "100%",
+            maxWidth: 360,
+            bgcolor: "background.paper",
+            overflow: "auto",
+            height: "230px",
+          }}
         >
-          {[0, 1, 2, 3].map((value) => {
-            const labelId = `checkbox-list-secondary-label-${value}`;
+          {onlineInfo?.map((user) => {
+            if (user?._id === session?.user?._id)
+              return <div key={user?._id}></div>;
             return (
-              <ListItem key={value} disablePadding>
+              <ListItem key={user?._id} disablePadding onClick={() => handleAccess(user?._id)}>
                 <ListItemButton>
                   <ListItemAvatar className="avatar">
                     <StyledBadge
@@ -153,16 +207,11 @@ const RightBar = () => {
                       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                       variant="dot"
                     >
-                      <Avatar
-                        alt="Remy Sharp"
-                        src="/static/images/avatar/1.jpg"
-                      />
+                      <Avatar alt={user?.name} src={user?.avatar} />
                     </StyledBadge>
                   </ListItemAvatar>
-                  <ListItemText
-                    id={labelId}
-                    primary={`Line item ${value + 1}`}
-                  />
+
+                  <ListItemText primary={user?.name} />
                 </ListItemButton>
               </ListItem>
             );

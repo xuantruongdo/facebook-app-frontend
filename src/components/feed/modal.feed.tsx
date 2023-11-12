@@ -18,6 +18,7 @@ import { convertSlugUrl, sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { useUserContext } from "@/app/lib/user.context";
 dayjs.extend(relativeTime);
 
 const style = {
@@ -49,6 +50,7 @@ const ModalFeed = (props: IProps) => {
   const router = useRouter();
   const [content, setContent] = React.useState<string>("");
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const {socket, setSocket} = useUserContext() as IUserContext
 
   const handleClose = () => setOpen(false);
 
@@ -64,7 +66,7 @@ const ModalFeed = (props: IProps) => {
       theme: "light",
     });
 
-  const handleLike = async (id: string) => {
+  const handleLike = async (id: string, isLike: boolean) => {
     const res = await sendRequest<IBackendRes<IPost>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/like/${id}`,
       method: "POST",
@@ -76,12 +78,15 @@ const ModalFeed = (props: IProps) => {
     if (res && res.data) {
       router.refresh();
       setPostView(res.data);
+      if (!isLike && res?.data?.author?._id !== session?.user?._id) {
+        socket?.emit("like", { sender: session?.user, post: res?.data, type: "like", createdAt: new Date() });
+      }
     } else {
       notify(res?.message);
     }
   };
 
-  const handleSubmit = async (id: string) => {
+  const handleComment = async (id: string) => {
     const res = await sendRequest<IBackendRes<IPost>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments/${id}`,
       method: "POST",
@@ -97,6 +102,10 @@ const ModalFeed = (props: IProps) => {
       router.refresh();
       setPostView(res.data);
       setContent("");
+
+      if (res?.data?.author?._id !== session?.user?._id) {
+        socket?.emit("comment", { sender: session?.user, post: res?.data, type: "comment", createdAt: new Date() });
+      }
     } else {
       notify(res?.message);
     }
@@ -206,7 +215,12 @@ const ModalFeed = (props: IProps) => {
                   }
                   label="Like"
                   sx={{ cursor: "pointer" }}
-                  onClick={() => handleLike(postView?._id)}
+                  onClick={() =>
+                    handleLike(
+                      postView?._id,
+                      postView?.likes?.some((t) => t._id === session?.user?._id)
+                    )
+                  }
                 />
 
                 <Chip
@@ -242,7 +256,7 @@ const ModalFeed = (props: IProps) => {
                   onChange={(e) => setContent(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      handleSubmit(postView?._id);
+                      handleComment(postView?._id);
                     }
                   }}
                   inputRef={inputRef}
