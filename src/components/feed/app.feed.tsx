@@ -14,11 +14,11 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { convertSlugUrl, sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import { useUserContext } from "@/app/lib/user.context";
+import { notifyError } from "@/app/logic/logic";
 
 
 interface IProps {
@@ -38,18 +38,6 @@ const Feed = (props: IProps) => {
     setPostView(post);
   };
 
-  const notify = (message: string) =>
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
-
   const handleLike = async (id: string, isLike: boolean) => {
     try {
       const res = await sendRequest<IBackendRes<IPost>>({
@@ -66,7 +54,7 @@ const Feed = (props: IProps) => {
           socket?.emit("like", { sender: session?.user, post: res?.data, type: "like", createdAt: new Date() });
         }
       } else {
-        notify(res?.message);
+        notifyError(res?.message);
       }
     } catch (error) {
       console.error("Error while handling like:", error);

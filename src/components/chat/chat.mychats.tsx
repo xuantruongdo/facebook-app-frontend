@@ -7,6 +7,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
+import GroupIcon from "@mui/icons-material/Group";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -17,6 +18,7 @@ import { checkReceiver } from "@/app/logic/logic";
 import { useSession } from "next-auth/react";
 import { useChatContext } from "@/app/lib/chat.context";
 import { useRouter } from "next/navigation";
+import ModalCreateGroup from "./modal.create";
 
 interface IProps {
   myChats: IChat[];
@@ -25,6 +27,7 @@ const MyChats = (props: IProps) => {
   const { myChats } = props;
   const { data: session } = useSession();
   const [open, setOpen] = React.useState<boolean>(false);
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [userSearch, setUserSearch] = React.useState<IUser[]>();
   const router = useRouter();
 
@@ -37,7 +40,7 @@ const MyChats = (props: IProps) => {
 
   React.useEffect(() => {
     setChats(myChats);
-  }, [selectedChat?.latestMessage]);
+  }, [selectedChat?.latestMessage, myChats]);
 
   const handleSearch = async (name: string) => {
     if (name) {
@@ -101,7 +104,9 @@ const MyChats = (props: IProps) => {
           <Button variant="outlined" onClick={() => setOpen(!open)}>
             Search user
           </Button>
-          <Button variant="contained">Create a group</Button>
+          <Button variant="contained" onClick={() => setOpenModal(true)}>
+            Create a group
+          </Button>
         </Box>
 
         <List sx={{ width: "100%" }}>
@@ -124,7 +129,7 @@ const MyChats = (props: IProps) => {
                 }}
               >
                 <ListItemAvatar>
-                  {!chat?.isGroupChat && (
+                  {!chat?.isGroupChat ? (
                     <Avatar
                       alt="user"
                       src={
@@ -132,6 +137,10 @@ const MyChats = (props: IProps) => {
                         checkReceiver(chat?.users, session?.user?._id)?.avatar
                       }
                     />
+                  ) : (
+                    <Avatar>
+                      <GroupIcon />
+                    </Avatar>
                   )}
                 </ListItemAvatar>
                 <Box>
@@ -142,6 +151,10 @@ const MyChats = (props: IProps) => {
                         checkReceiver(chat?.users, session?.user?._id!)?.name
                     }
                   </Typography>
+                  {chat?.isGroupChat && (
+                    <Typography>{chat?.chatName}</Typography>
+                  )}
+
                   {chat?.latestMessage && (
                     <Box sx={{ display: "flex", gap: "10px" }}>
                       <Typography
@@ -189,25 +202,27 @@ const MyChats = (props: IProps) => {
           />
           <List dense sx={{ width: "100%", maxWidth: 360 }}>
             {userSearch?.map((user: IUser) => {
-              if(user?._id === session?.user?._id) return <div key={user?._id}></div>
+              if (user?._id === session?.user?._id)
+                return <div key={user?._id}></div>;
               return (
                 <ListItem
-                key={user?._id}
-                disablePadding
-                onClick={() => handleAccess(user?._id)}
-              >
-                <ListItemButton>
-                  <ListItemAvatar>
-                    <Avatar alt={user?.name} src={user?.avatar} />
-                  </ListItemAvatar>
-                  <ListItemText primary={user?.name} />
-                </ListItemButton>
-              </ListItem>
-              )
+                  key={user?._id}
+                  disablePadding
+                  onClick={() => handleAccess(user?._id)}
+                >
+                  <ListItemButton>
+                    <ListItemAvatar>
+                      <Avatar alt={user?.name} src={user?.avatar} />
+                    </ListItemAvatar>
+                    <ListItemText primary={user?.name} />
+                  </ListItemButton>
+                </ListItem>
+              );
             })}
           </List>
         </Box>
       </Drawer>
+      <ModalCreateGroup openModal={openModal} setOpenModal={setOpenModal} />
     </>
   );
 };

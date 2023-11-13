@@ -6,8 +6,8 @@ const ChatContext = createContext<IChatContext | null>(null);
 
 export const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 
-    const [chats, setChats] = useState<IUser[]>();
-    const [selectedChat, setSelectedChat] = useState<IUser>();
+    const [chats, setChats] = useState<IChat[]>();
+    const [selectedChat, setSelectedChat] = useState<IChat>();
 
     return (
         <ChatContext.Provider value={{ chats, setChats, selectedChat, setSelectedChat }}>

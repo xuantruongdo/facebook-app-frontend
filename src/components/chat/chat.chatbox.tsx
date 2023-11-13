@@ -10,9 +10,9 @@ import { useSession } from "next-auth/react";
 import { sendRequest } from "@/utils/api";
 import { useChatContext } from "@/app/lib/chat.context";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { checkReceiver } from "@/app/logic/logic";
+import { checkReceiver, isValidContent, notifyError } from "@/app/logic/logic";
 import io, { Socket } from "socket.io-client";
+import ModalSetting from "./modal.setting";
 
 const ENDPOINT = "http://localhost:8002";
 
@@ -26,23 +26,11 @@ const ChatBox = () => {
   const [socket, setSocket] = React.useState<Socket>();
   // const [isTyping, setIsTyping] = React.useState<boolean>(false);
   const [messages, setMessages] = React.useState<IMessage[]>();
+  const [openModalSetting, setOpenModalSetting] = React.useState<boolean>(false);
 
   const handleChange = (text: string) => {
     setContent(text);
   };
-  
-
-  const notify = (message: string) =>
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
 
   const fetchMessagesChat = async () => {
     const res = await sendRequest<IBackendRes<IMessage[]>>({
@@ -64,7 +52,12 @@ const ChatBox = () => {
     }
   }, [selectedChat]);
 
-  const handleSubmit = async () => {
+  const handleSendMessage = async () => {
+    if (!isValidContent(content)) {
+      notifyError("Please fill in the message content");
+      return;
+    }
+
     const res = await sendRequest<IBackendRes<IPost>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/messages`,
       method: "POST",
@@ -91,7 +84,7 @@ const ChatBox = () => {
       setContent("");
       socket?.emit("message", res.data);
     } else {
-      notify(res?.message);
+      notifyError(res?.message);
     }
   };
 
@@ -113,9 +106,8 @@ const ChatBox = () => {
         setMessages((prevMessages) => [...prevMessages!, message]);
         // Handle the message as needed
       });
-  
     }
-  
+
     return () => {
       if (socket) {
         socket.disconnect();
@@ -123,57 +115,73 @@ const ChatBox = () => {
     };
   }, [socket, setMessages]);
 
-
   return (
     <Card sx={{ flex: 2, height: "calc(100vh - 104px)" }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          margin: "20px",
-        }}
-      >
-        <div></div>
-        <Typography component={"h2"} sx={{ fontSize: "24px" }}>
-          {selectedChat && !selectedChat?.isGroupChat
-            ? checkReceiver(selectedChat?.users, session?.user?._id!)?.name
-            : selectedChat?.chatName}
-        </Typography>
-        {selectedChat && selectedChat?.isGroupChat ? (
-          <Button variant="contained">
-            <RemoveRedEyeIcon />
-          </Button>
-        ) : (
-          <div></div>
-        )}
-      </Box>
-      <Box
-        sx={{
-          width: "100%",
-          height: "90%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "20px",
-          background: "#e8e8e8",
-          overflowY: "hidden",
-        }}
-      >
-        <ScrollableChat messages={messages!} />
-        {/* {isTyping && <div>Loading...</div>} */}
-        <TextField
-          variant="standard"
-          placeholder="Text..."
-          value={content}
-          onChange={(e) => handleChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSubmit();
-            }
+      {selectedChat ? (
+        <>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              margin: "20px",
+            }}
+          >
+            <div></div>
+            <Typography component={"h2"} sx={{ fontSize: "24px" }}>
+              {selectedChat && !selectedChat?.isGroupChat
+                ? checkReceiver(selectedChat?.users, session?.user?._id!)?.name
+                : selectedChat?.chatName}
+            </Typography>
+            {selectedChat && selectedChat?.isGroupChat ? (
+              <Button variant="contained" onClick={() => setOpenModalSetting(true)}>
+                <RemoveRedEyeIcon />
+              </Button>
+            ) : (
+              <div></div>
+            )}
+          </Box>
+          <Box
+            sx={{
+              width: "100%",
+              height: "90%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "20px",
+              background: "#e8e8e8",
+              overflowY: "hidden",
+            }}
+          >
+            <ScrollableChat messages={messages!} />
+            {/* {isTyping && <div>Loading...</div>} */}
+            <TextField
+              variant="standard"
+              placeholder="Text..."
+              value={content}
+              onChange={(e) => handleChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSendMessage();
+                }
+              }}
+            />
+          </Box>
+        </>
+      ) : (
+        <Typography
+          sx={{
+            fontSize: "30px",
+            textAlign: "center",
+            color: "gray",
+            marginTop: "20px",
           }}
-        />
-      </Box>
+        >
+          Click A Box Chat
+        </Typography>
+      )}
+
+      <ModalSetting openModalSetting={openModalSetting} setOpenModalSetting={setOpenModalSetting} />
     </Card>
   );
 };

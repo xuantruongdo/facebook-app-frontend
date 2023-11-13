@@ -14,8 +14,8 @@ import LockPersonIcon from "@mui/icons-material/LockPerson";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { sendRequest } from "@/utils/api";
+import { notifyError, notifySuccess } from "@/app/logic/logic";
 
 const AuthSignUp = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -39,29 +39,6 @@ const AuthSignUp = () => {
   const [errorConfirmPassword, setErrorConfirmPassword] = useState<string>("");
 
   const router = useRouter();
-  const notifyError = (message: string) =>
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
-
-  const notifySuccess = (message: string) =>
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
 
   const handleSubmit = async () => {
     console.log(email, name, password, confirmPassword);

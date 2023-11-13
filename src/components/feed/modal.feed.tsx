@@ -17,8 +17,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { convertSlugUrl, sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { toast } from "react-toastify";
 import { useUserContext } from "@/app/lib/user.context";
+import { isValidContent, notifyError } from "@/app/logic/logic";
 dayjs.extend(relativeTime);
 
 const style = {
@@ -50,21 +50,9 @@ const ModalFeed = (props: IProps) => {
   const router = useRouter();
   const [content, setContent] = React.useState<string>("");
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const {socket, setSocket} = useUserContext() as IUserContext
+  const { socket, setSocket } = useUserContext() as IUserContext;
 
   const handleClose = () => setOpen(false);
-
-  const notify = (message: string) =>
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
 
   const handleLike = async (id: string, isLike: boolean) => {
     const res = await sendRequest<IBackendRes<IPost>>({
@@ -79,14 +67,24 @@ const ModalFeed = (props: IProps) => {
       router.refresh();
       setPostView(res.data);
       if (!isLike && res?.data?.author?._id !== session?.user?._id) {
-        socket?.emit("like", { sender: session?.user, post: res?.data, type: "like", createdAt: new Date() });
+        socket?.emit("like", {
+          sender: session?.user,
+          post: res?.data,
+          type: "like",
+          createdAt: new Date(),
+        });
       }
     } else {
-      notify(res?.message);
+      notifyError(res?.message);
     }
   };
 
   const handleComment = async (id: string) => {
+    if (!isValidContent(content)) {
+      notifyError("Please fill in the comment content");
+      return;
+    }
+
     const res = await sendRequest<IBackendRes<IPost>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/comments/${id}`,
       method: "POST",
@@ -104,10 +102,15 @@ const ModalFeed = (props: IProps) => {
       setContent("");
 
       if (res?.data?.author?._id !== session?.user?._id) {
-        socket?.emit("comment", { sender: session?.user, post: res?.data, type: "comment", createdAt: new Date() });
+        socket?.emit("comment", {
+          sender: session?.user,
+          post: res?.data,
+          type: "comment",
+          createdAt: new Date(),
+        });
       }
     } else {
-      notify(res?.message);
+      notifyError(res?.message);
     }
   };
 

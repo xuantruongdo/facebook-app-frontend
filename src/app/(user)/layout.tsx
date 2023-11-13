@@ -2,7 +2,7 @@ import AppHeader from "@/components/header/app.header";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Facebook",
+  title: "FACENET",
   description: "Social media website",
 };
 

@@ -17,7 +17,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { notifyError } from "@/app/logic/logic";
 
 const AuthSignIn = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -32,17 +32,6 @@ const AuthSignIn = () => {
   const [errorPassword, setErrorPassword] = useState<string>("");
 
   const router = useRouter();
-  const notify = (message: string) =>
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
 
   const handleSubmit = async () => {
     setIsErrorUsername(false);
@@ -71,7 +60,7 @@ const AuthSignIn = () => {
     if (res && !res.error) {
       router.push("/");
     } else {
-      notify(res?.error!);
+      notifyError(res?.error!);
     }
   };
   return (

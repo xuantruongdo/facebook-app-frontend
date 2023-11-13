@@ -438,7 +438,7 @@ export default function AppHeader() {
                 aria-label="show 4 new mails"
                 color="inherit"
               >
-                <Badge badgeContent={4} color="error">
+                <Badge badgeContent={0} color="error">
                   <GroupIcon />
                 </Badge>
               </IconButton>
@@ -449,7 +449,7 @@ export default function AppHeader() {
                 aria-label="show 4 new mails"
                 color="inherit"
               >
-                <Badge badgeContent={4} color="error">
+                <Badge badgeContent={0} color="error">
                   <MessageIcon />
                 </Badge>
               </IconButton>

@@ -66,8 +66,8 @@ declare global {
     from: string;
     isActive: boolean;
     type: string;
-    followers: string[];
-    followings: string[];
+    followers: IUser[];
+    followings: IUser[];
     isDeleted: false;
     createdAt: string;
     updatedAt: string;

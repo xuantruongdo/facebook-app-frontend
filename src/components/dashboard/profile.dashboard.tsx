@@ -11,9 +11,9 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import RssFeedIcon from "@mui/icons-material/RssFeed";
 import { useSession } from "next-auth/react";
 import { sendRequest } from "@/utils/api";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/app/lib/user.context";
+import { notifyError } from "@/app/logic/logic";
 
 interface IProps {
   user: IUser;
@@ -42,18 +42,6 @@ const ProfileDashboard = (props: IProps) => {
   React.useEffect(() => {
     fetchCurrentUser();
   }, [session?.user?._id]);
-
-  const notify = (message: string) =>
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
 
   const handleFollow = async (isFollow: boolean) => {
     const res = await sendRequest<IBackendRes<IUser>>({
@@ -84,9 +72,10 @@ const ProfileDashboard = (props: IProps) => {
         });
       }
     } else {
-      notify(res?.message);
+      notifyError(res?.message);
     }
   };
+
   return (
     <Box>
       <Box sx={{ width: "100%", height: "360px", background: "#aaa" }}>
@@ -153,12 +142,12 @@ const ProfileDashboard = (props: IProps) => {
         {session?.user?._id !== user?._id && (
           <Box>
             <Box className="button-wrapper">
-              {currentUser?.followings?.some((id) => id === user?._id) ? (
+              {currentUser?.followings?.some((u) => u._id === user?._id) ? (
                 <Button
                   variant="outlined"
                   onClick={() =>
                     handleFollow(
-                      currentUser?.followings?.some((id) => id === user?._id)!
+                      currentUser?.followings?.some((u) => u._id === user?._id)!
                     )
                   }
                 >
@@ -170,7 +159,7 @@ const ProfileDashboard = (props: IProps) => {
                   variant="outlined"
                   onClick={() =>
                     handleFollow(
-                      currentUser?.followings?.some((id) => id === user?._id)!
+                      currentUser?.followings?.some((u) => u._id === user?._id)!
                     )
                   }
                 >

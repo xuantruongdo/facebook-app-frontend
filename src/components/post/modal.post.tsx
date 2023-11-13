@@ -12,9 +12,9 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
 import { useSession } from "next-auth/react";
 import { sendRequest } from "@/utils/api";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import { isValidContent, notifyError, notifySuccess } from "@/app/logic/logic";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -38,7 +38,7 @@ const style = {
   boxShadow: 24,
   p: 4,
   borderRadius: "5px",
-  outline: "none"
+  outline: "none",
 };
 
 interface IProps {
@@ -53,18 +53,6 @@ const ModalPost = (props: IProps) => {
   const router = useRouter();
 
   const handleClose = () => setOpen(false);
-
-  const notify = (message: string) =>
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
 
   const handleUpload = (pics: any) => {
     //@ts-ignore
@@ -91,7 +79,12 @@ const ModalPost = (props: IProps) => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handlePost = async () => {
+    if (!isValidContent(content)) {
+      notifyError("Please fill in the post content");
+      return;
+    }
+
     const res = await sendRequest<IBackendRes<IPost>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
       method: "POST",
@@ -107,7 +100,7 @@ const ModalPost = (props: IProps) => {
     if (res && res.data) {
       setContent("");
       setPic("");
-      notify("Posted successfully");
+      notifySuccess("Posted successfully");
       handleClose();
       router.refresh();
     }
@@ -137,16 +130,20 @@ const ModalPost = (props: IProps) => {
             />
           </Box>
           <Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Typography
-              sx={{ marginLeft: "15px", fontWeight: "bold", color: "#626262" }}
-            >
-              {session?.user?.name}
-            </Typography>
-            {session?.user?.isActive && (
-              <VerifiedIcon color="primary" sx={{ fontSize: "16px" }} />
-            )}
-          </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <Typography
+                sx={{
+                  marginLeft: "15px",
+                  fontWeight: "bold",
+                  color: "#626262",
+                }}
+              >
+                {session?.user?.name}
+              </Typography>
+              {session?.user?.isActive && (
+                <VerifiedIcon color="primary" sx={{ fontSize: "16px" }} />
+              )}
+            </Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography
                 sx={{ marginLeft: "15px", fontSize: "12px", color: "#626262" }}
@@ -196,7 +193,7 @@ const ModalPost = (props: IProps) => {
           <Button
             variant="contained"
             sx={{ float: "right", marginTop: "20px" }}
-            onClick={handleSubmit}
+            onClick={handlePost}
           >
             Share
           </Button>
