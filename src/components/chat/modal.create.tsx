@@ -19,8 +19,8 @@ const style = {
   top: "40%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "40%",
   maxHeight: "60%",
+  width: "50%",
   bgcolor: "background.paper",
   boxShadow: 24,
   overflow: "hidden",
@@ -124,7 +124,7 @@ const ModalCreateGroup = (props: IProps) => {
 
   return (
     <Modal open={openModal} onClose={handleClose}>
-      <Box sx={style}>
+      <Box sx={style} className="modal-chat">
         <Typography
           sx={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}
         >
@@ -136,7 +136,6 @@ const ModalCreateGroup = (props: IProps) => {
             label="Chat Name"
             variant="outlined"
             fullWidth
-            value={chatName}
             onChange={(e) => setChatName(e.target.value)}
           />
           <Select

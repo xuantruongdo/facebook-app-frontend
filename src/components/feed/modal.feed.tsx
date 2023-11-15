@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserContext } from "@/app/lib/user.context";
 import { isValidContent, notifyError } from "@/app/logic/logic";
+import { useMediaQuery } from "@mui/material";
 dayjs.extend(relativeTime);
 
 const style = {
@@ -30,7 +31,7 @@ const style = {
   maxHeight: "60%",
   bgcolor: "background.paper",
   boxShadow: 24,
-  overflow: "hidden",
+  overflow: "auto",
   p: 4,
   borderRadius: "5px",
   outline: "none",
@@ -50,6 +51,7 @@ const ModalFeed = (props: IProps) => {
   const router = useRouter();
   const [content, setContent] = React.useState<string>("");
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const isMobileScreen = useMediaQuery("(max-width:600px)");
   const { socket, setSocket } = useUserContext() as IUserContext;
 
   const handleClose = () => setOpen(false);
@@ -115,7 +117,7 @@ const ModalFeed = (props: IProps) => {
   };
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleClose} sx={{ '& .MuiBackdrop-root': { backgroundColor: 'rgba(0, 0, 0, 0.1)' } }}>
       <Box sx={style} className="modal-pic">
         <Box>
           <Grid container spacing={4}>
@@ -134,7 +136,7 @@ const ModalFeed = (props: IProps) => {
                   alt="pic"
                   style={{
                     maxWidth: "100%",
-                    maxHeight: "500px",
+                    maxHeight: `${isMobileScreen ? "188px" : "500px"}`,
                     objectFit: "contain",
                   }}
                 />

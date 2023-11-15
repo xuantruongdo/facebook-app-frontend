@@ -1,6 +1,6 @@
 import "@/app/styles/global.scss";
 import NextAuthWrapper from "./lib/next.auth.wrapper";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NProgressWrapper from "./lib/nprogress.wrapper";
 import { ChatContextProvider } from "./lib/chat.context";

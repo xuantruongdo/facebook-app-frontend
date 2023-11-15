@@ -14,13 +14,28 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import GroupsIcon from "@mui/icons-material/Groups";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-const LeftBar = () => {
+interface IProps {
+  open?: boolean;
+  setOpen?: (v: boolean) => void;
+}
+const LeftBar = (props: IProps) => {
+  const { open, setOpen } = props;
+  const router = useRouter();
   return (
     <Box sx={{ position: "sticky", top: "70px" }}>
       <List>
         <ListItem disablePadding>
-          <ListItemButton>
+          <ListItemButton
+            onClick={() => {
+              router.push("/");
+              if (setOpen) {
+                setOpen(false);
+              }
+            }}
+          >
             <ListItemIcon>
               <FeedIcon color="primary" />
             </ListItemIcon>
@@ -28,12 +43,21 @@ const LeftBar = () => {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon>
-              <PeopleAltIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText primary="Friends" />
-          </ListItemButton>
+          <Link href={"/follow"} style={{ width: "100%" }}>
+            <ListItemButton
+              onClick={() => {
+                router.push("/");
+                if (setOpen) {
+                  setOpen(false);
+                }
+              }}
+            >
+              <ListItemIcon>
+                <PeopleAltIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText primary="Friends" />
+            </ListItemButton>
+          </Link>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton>

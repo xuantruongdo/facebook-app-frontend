@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Card, TextField } from "@mui/material";
+import { Card, TextField, useMediaQuery } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { useChatContext } from "@/app/lib/chat.context";
 import { useRouter } from "next/navigation";
 import ModalCreateGroup from "./modal.create";
+import { useUserContext } from "@/app/lib/user.context";
 
 interface IProps {
   myChats: IChat[];
@@ -30,6 +31,8 @@ const MyChats = (props: IProps) => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [userSearch, setUserSearch] = React.useState<IUser[]>();
   const router = useRouter();
+
+  const { socket, setSocket } = useUserContext() as IUserContext;
 
   const { chats, setChats, selectedChat, setSelectedChat } =
     useChatContext() as IChatContext;
@@ -62,7 +65,7 @@ const MyChats = (props: IProps) => {
   };
 
   const handleAccess = async (receivedId: string) => {
-    const res = await sendRequest<IBackendRes<IChat[]>>({
+    const res = await sendRequest<IBackendRes<IChat>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/chats`,
       method: "POST",
       headers: {
@@ -82,15 +85,21 @@ const MyChats = (props: IProps) => {
       });
       setOpen(false);
       router.refresh();
-      setChats([res.data, ...chats]);
       setSelectedChat(res.data);
+      socket?.emit('joinRoom', res.data._id)
     }
+  };
+
+  const joinRoom = (chat: IChat) => {
+    setSelectedChat(chat);
+    socket?.emit('joinRoom', chat?._id)
   };
 
   return (
     <>
       <Card
-        sx={{ flex: 1, background: "white", minHeight: "calc(100vh - 104px)" }}
+        sx={{ flex: 1, background: "white", minHeight: "calc(100vh - 150px)" }}
+        className="mychats"
       >
         <Box
           sx={{
@@ -109,12 +118,12 @@ const MyChats = (props: IProps) => {
           </Button>
         </Box>
 
-        <List sx={{ width: "100%" }}>
+        <List sx={{ width: "100%", overflow: "auto", height: "50vh" }}>
           {chats?.map((chat: any) => (
             <ListItem
               alignItems="flex-start"
               key={chat?._id}
-              onClick={() => setSelectedChat(chat)}
+              onClick={() => joinRoom(chat)}
             >
               <ListItemButton
                 sx={{
@@ -193,7 +202,7 @@ const MyChats = (props: IProps) => {
         </List>
       </Card>
       <Drawer open={open} onClose={handleClose}>
-        <Box sx={{ width: "500px", padding: "20px" }}>
+        <Box sx={{ width: "300px", padding: "20px" }}>
           <TextField
             variant="standard"
             label="Search user"

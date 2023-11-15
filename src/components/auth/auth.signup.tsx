@@ -41,7 +41,6 @@ const AuthSignUp = () => {
   const router = useRouter();
 
   const handleSubmit = async () => {
-    console.log(email, name, password, confirmPassword);
     setIsErrorEmail(false);
     setIsErrorName(false);
     setIsErrorPassword(false);

@@ -15,10 +15,11 @@ import RssFeedIcon from "@mui/icons-material/RssFeed";
 
 interface IProps {
   user: IUser;
+  type: string;
 }
 
 const Info = (props: IProps) => {
-  const { user } = props;
+  const { user, type } = props;
 
   return (
     <Box
@@ -28,18 +29,23 @@ const Info = (props: IProps) => {
         borderRadius: "5px",
       }}
     >
-      <Typography
-        sx={{ fontSize: "18px", fontWeight: "bold", color: "#626262" }}
-      >
-        Info
-      </Typography>
+      {type === "pc" && (
+        <Box>
+          <Typography
+            sx={{ fontSize: "18px", fontWeight: "bold", color: "#626262" }}
+          >
+            Info
+          </Typography>
 
-      <Typography
-        sx={{ fontSize: "14px", color: "#626262", textAlign: "center" }}
-      >
-        {user?.note}
-      </Typography>
-      <Divider />
+          <Typography
+            sx={{ fontSize: "14px", color: "#626262", textAlign: "center" }}
+          >
+            {user?.note}
+          </Typography>
+          <Divider />
+        </Box>
+      )}
+
       <Box>
         <List>
           {user?.work && (

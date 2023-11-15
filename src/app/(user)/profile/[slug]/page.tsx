@@ -5,8 +5,9 @@ import Sidebar from "@/components/sidebar/profile.sidebar";
 import Post from "@/components/post/app.post";
 import Feed from "@/components/feed/app.feed";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth/next"
+import { getServerSession } from "next-auth/next";
 import { sendRequest } from "@/utils/api";
+import TabsProfile from "@/components/tabs/profile.tabs";
 
 const ProfilePage = async (props: any) => {
   const session = await getServerSession(authOptions);
@@ -20,14 +21,14 @@ const ProfilePage = async (props: any) => {
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/${id}`,
     method: "GET",
     nextOption: {
-      next: {tags: ['follow-user']}
-    }
+      next: { tags: ["follow-user"] },
+    },
   });
 
   const posts = await sendRequest<IBackendRes<IPost[]>>({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/author/${id}`,
     method: "GET",
-  })
+  });
 
   return (
     <div
@@ -39,6 +40,7 @@ const ProfilePage = async (props: any) => {
     >
       <Container>
         <ProfileDashboard user={res?.data!} />
+        <TabsProfile user={res?.data!} posts={posts?.data!} />
         <Grid
           container
           sx={{
@@ -50,14 +52,12 @@ const ProfilePage = async (props: any) => {
           className="profile-wrapper"
         >
           <Grid item xs={0} md={4}>
-            <Sidebar user={res?.data!}/>
+            <Sidebar user={res?.data!} posts={posts?.data!} />
           </Grid>
           <Grid item xs={12} md={8}>
-            {
-              session?.user?._id === id && <Post />
-            }
-            
-            <Feed posts={ posts?.data! } />
+            {session?.user?._id === id && <Post />}
+
+            <Feed posts={posts?.data!} />
           </Grid>
         </Grid>
       </Container>

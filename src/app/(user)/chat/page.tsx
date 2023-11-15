@@ -1,15 +1,14 @@
-import ChatBox from "@/components/chat/chat.chatbox";
-import MyChats from "@/components/chat/chat.mychats";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth/next"
+import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { sendRequest } from "@/utils/api";
+import ChatMain from "@/components/chat/main.chat";
 
 const ChatPage = async () => {
   const session = await getServerSession(authOptions);
   if (!session) {
-      redirect("/");
+    redirect("/");
   }
 
   const chats = await sendRequest<IBackendRes<IChat[]>>({
@@ -19,9 +18,9 @@ const ChatPage = async () => {
       Authorization: `Bearer ${session?.access_token}`,
     },
     nextOption: {
-      next: {tags: ['access-chat']}
-    }
-  })
+      next: { tags: ["access-chat"] },
+    },
+  });
 
   return (
     <Box
@@ -31,9 +30,8 @@ const ChatPage = async () => {
         paddingTop: "84px",
       }}
     >
-      <Box sx={{ display: "flex", gap: "50px", margin: "0 50px" }}>
-        <MyChats myChats={chats?.data!}/>
-        <ChatBox />
+      <Box>
+        <ChatMain myChats={chats?.data!} />
       </Box>
     </Box>
   );

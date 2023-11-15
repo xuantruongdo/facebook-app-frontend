@@ -13,6 +13,29 @@ a {
   display: none;
 }
 
+.upload-container {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  flex-direction: column;
+  cursor: pointer;
+  border: dashed 1px #ccc;
+  background-color: #fafafa;
+  color: #bdbdbd;
+}
+.drawer-header {
+  display: none;
+}
+.menu-btn {
+  display: none;
+}
+.tabs-profile {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   .modal-pic {
     width: 90%;
@@ -20,11 +43,12 @@ a {
   .modal-post {
     width: 60%;
   }
+  .modal-chat{
+    width: 70%;
+  }
 }
 
-
 @media (max-width: 900px) {
-
   .left-bar {
     display: none;
   }
@@ -34,21 +58,35 @@ a {
   .home-container {
     margin: 0 10px;
   }
-  .sidebar{
+  .sidebar {
     display: none;
   }
-  .profile-wrapper{
+  .profile-wrapper {
     gap: 0;
   }
-  .button-wrapper{
+  .button-wrapper {
     display: none;
   }
-  .expand-btn{
+  .expand-btn {
     display: block;
   }
   .modal-pic {
-    top: "30%",
+    top: "30%";
   }
+  .drawer-header {
+    display: block;
+  }
+  .menu-btn {
+    display: block;
+  }
+  .tabs-profile {
+    display: block;
+  }
+
+  .modal-chat{
+    width: 80%;
+  }
+
 }
 
 @media (max-width: 600px) {
@@ -62,18 +100,7 @@ a {
   .modal-post {
     width: 90%;
   }
-}
-
-.upload-container {
-  width: 100%;
-  height: 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  flex-direction: column;
-  cursor: pointer;
-  border: dashed 1px #ccc;
-  background-color: #fafafa;
-  color: #bdbdbd;
+  .modal-chat{
+    width: 90%;
+  }
 }

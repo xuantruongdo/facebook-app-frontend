@@ -46,7 +46,13 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const RightBar = () => {
+interface IProps {
+  open?: boolean;
+  setOpen?: (v: boolean) => void;
+}
+
+const RightBar = (props: IProps) => {
+  const { open, setOpen } = props;
   const { data: session } = useSession();
   const { onlineUsers, setOnlineUsers } = useUserContext() as IUserContext;
   const { chats, setChats, selectedChat, setSelectedChat } =
@@ -84,8 +90,11 @@ const RightBar = () => {
 
     if (res && res.data) {
       router.refresh();
-      router.push('/chat');
+      router.push("/chat");
       setSelectedChat(res.data);
+      if (setOpen) {
+        setOpen(false);
+      }
     }
   };
 
@@ -199,7 +208,11 @@ const RightBar = () => {
             if (user?._id === session?.user?._id)
               return <div key={user?._id}></div>;
             return (
-              <ListItem key={user?._id} disablePadding onClick={() => handleAccess(user?._id)}>
+              <ListItem
+                key={user?._id}
+                disablePadding
+                onClick={() => handleAccess(user?._id)}
+              >
                 <ListItemButton>
                   <ListItemAvatar className="avatar">
                     <StyledBadge

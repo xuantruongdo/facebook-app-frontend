@@ -23,7 +23,7 @@ const style = {
   top: "40%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "40%",
+  width: "50%",
   height: "500px",
   bgcolor: "background.paper",
   boxShadow: 24,
@@ -133,7 +133,7 @@ const ModalSetting = (props: IProps) => {
   return (
     <>
       <Modal open={openModalSetting} onClose={handleClose}>
-        <Box sx={style}>
+        <Box sx={style} className="modal-chat">
           <Typography
             sx={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}
           >

@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Box, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useSession } from "next-auth/react";
 import ScrollableFeed from "react-scrollable-feed";
 import dayjs from "dayjs";
@@ -13,7 +13,7 @@ interface IProps {
 const ScrollableChat = (props: IProps) => {
   const { messages } = props;
   const { data: session } = useSession();
-
+  const isMobileScreen = useMediaQuery("(max-width:600px)");
   return (
     <ScrollableFeed>
       <Box sx={{ marginTop: "20px" }}>
@@ -55,7 +55,7 @@ const ScrollableChat = (props: IProps) => {
                     }`,
                     borderRadius: "20px",
                     padding: "5px 15px",
-                    maxWidth: "500px",
+                    maxWidth: `${isMobileScreen ? "200px" : "400px"}`,
                     marginTop: "5px",
                   }}
                 >

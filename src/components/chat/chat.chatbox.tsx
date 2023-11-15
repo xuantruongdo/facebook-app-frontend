@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
@@ -11,10 +11,8 @@ import { sendRequest } from "@/utils/api";
 import { useChatContext } from "@/app/lib/chat.context";
 import { useRouter } from "next/navigation";
 import { checkReceiver, isValidContent, notifyError } from "@/app/logic/logic";
-import io, { Socket } from "socket.io-client";
 import ModalSetting from "./modal.setting";
-
-const ENDPOINT = "http://localhost:8002";
+import { useUserContext } from "@/app/lib/user.context";
 
 const ChatBox = () => {
   const { data: session } = useSession();
@@ -22,11 +20,10 @@ const ChatBox = () => {
   const { chats, setChats, selectedChat, setSelectedChat } =
     useChatContext() as IChatContext;
   const [content, setContent] = React.useState<string>("");
-
-  const [socket, setSocket] = React.useState<Socket>();
-  // const [isTyping, setIsTyping] = React.useState<boolean>(false);
+  const { socket, setSocket } = useUserContext() as IUserContext;
   const [messages, setMessages] = React.useState<IMessage[]>();
   const [openModalSetting, setOpenModalSetting] = React.useState<boolean>(false);
+  const isMobileScreen = useMediaQuery("(max-width:900px)");
 
   const handleChange = (text: string) => {
     setContent(text);
@@ -70,6 +67,7 @@ const ChatBox = () => {
       },
     });
 
+
     if (res && res.data) {
       await sendRequest<IBackendRes<any>>({
         url: `/api/revalidate`,
@@ -82,41 +80,21 @@ const ChatBox = () => {
       router.refresh();
       fetchMessagesChat();
       setContent("");
-      socket?.emit("message", res.data);
+      socket?.emit("joinRoom", selectedChat?._id);
+      socket?.emit("sendMessage", {room: selectedChat?._id, message: res.data});
     } else {
       notifyError(res?.message);
     }
   };
 
   React.useEffect(() => {
-    const newSocket = io(ENDPOINT);
-    setSocket(newSocket);
-
-    return () => {
-      if (newSocket) {
-        newSocket.disconnect();
-      }
-    };
-  }, [setSocket]);
-
-  React.useEffect(() => {
-    // Handle incoming messages
-    if (socket) {
-      socket.on("message", (message) => {
-        setMessages((prevMessages) => [...prevMessages!, message]);
-        // Handle the message as needed
-      });
-    }
-
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, [socket, setMessages]);
-
+    socket?.on("newMessage", (message: any) => {
+      setMessages((prevMessages: any) => [...prevMessages, message]);
+    })
+  }, [socket])
+  
   return (
-    <Card sx={{ flex: 2, height: "calc(100vh - 104px)" }}>
+    <Card sx={{ flex: 2, height: "calc(100vh - 150px)" }}>
       {selectedChat ? (
         <>
           <Box
@@ -144,7 +122,7 @@ const ChatBox = () => {
           <Box
             sx={{
               width: "100%",
-              height: "90%",
+              height: "91%",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -154,10 +132,9 @@ const ChatBox = () => {
             }}
           >
             <ScrollableChat messages={messages!} />
-            {/* {isTyping && <div>Loading...</div>} */}
             <TextField
-              variant="standard"
-              placeholder="Text..."
+              variant="outlined"
+              placeholder="Type text in here ..."
               value={content}
               onChange={(e) => handleChange(e.target.value)}
               onKeyDown={(e) => {
@@ -165,6 +142,7 @@ const ChatBox = () => {
                   handleSendMessage();
                 }
               }}
+              sx={{margin: "10px 0"}}
             />
           </Box>
         </>
