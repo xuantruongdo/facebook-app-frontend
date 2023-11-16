@@ -4,6 +4,12 @@ import { redirect } from "next/navigation";
 import { sendRequest } from "@/utils/api";
 import Container from "@mui/material/Container";
 import Setting from "@/components/settings/setting";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Settings',
+  description: "Social media website",
+}
 
 const SettingPage = async (props: any) => {
   const { params } = props;

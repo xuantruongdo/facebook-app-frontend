@@ -12,6 +12,7 @@ import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import HomeIcon from "@mui/icons-material/Home";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import RssFeedIcon from "@mui/icons-material/RssFeed";
+import Link from "next/link";
 
 interface IProps {
   user: IUser;
@@ -89,10 +90,12 @@ const Info = (props: IProps) => {
               <ListItemIcon>
                 <RssFeedIcon />
               </ListItemIcon>
-              <ListItemText
-                style={{ color: "#696969" }}
-                primary={`${user?.followings.length} followings`}
-              />
+              <Link href={"/follow"}>
+                <ListItemText
+                  style={{ color: "#696969" }}
+                  primary={`${user?.followings.length} followings`}
+                />
+              </Link>
             </ListItem>
           )}
         </List>

@@ -138,6 +138,7 @@ export default function AppHeader() {
 
     return () => {
       socket?.off(`noti_${session?.user?._id}`, handleNotification);
+      socket?.off("onlineUsers");
     };
   }, [socket, session]);
 

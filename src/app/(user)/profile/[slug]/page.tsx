@@ -9,6 +9,43 @@ import { getServerSession } from "next-auth/next";
 import { sendRequest } from "@/utils/api";
 import TabsProfile from "@/components/tabs/profile.tabs";
 
+import type { Metadata, ResolvingMetadata } from "next";
+
+type Props = {
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // read route params
+  const temp = params?.slug?.split(".html") ?? [];
+  const temp1 = temp[0]?.split("-") as string[];
+  const id = temp1[temp1.length - 1];
+
+  const res = await sendRequest<IBackendRes<IUser>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/${id}`,
+    method: "GET",
+    nextOption: {
+      next: { tags: ["follow-user"] },
+    },
+  });
+
+  return {
+    title: `${res?.data?.name} - FACENET`,
+    openGraph: {
+      title: res?.data?.name,
+      type: "website",
+      images: [
+        res?.data?.avatar!,
+      ],
+    },
+  };
+}
+
+
 const ProfilePage = async (props: any) => {
   const session = await getServerSession(authOptions);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Box, Button, Drawer, Typography, useMediaQuery } from "@mui/material";
+import { Box, Button, Drawer, useMediaQuery } from "@mui/material";
 import MyChats from "./chat.mychats";
 import ChatBox from "./chat.chatbox";
 

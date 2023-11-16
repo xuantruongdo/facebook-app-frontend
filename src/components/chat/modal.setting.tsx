@@ -17,6 +17,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { notifyError, notifySuccess } from "@/app/logic/logic";
 import ModalAddMember from "./modal.addmember";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const style = {
   position: "absolute" as "absolute",
@@ -64,6 +65,7 @@ const ModalSetting = (props: IProps) => {
 
   const handleClose = () => {
     setOpenModalSetting(false);
+    setChecked([]);
   };
 
   const handleOpenAddModal = () => {
@@ -130,6 +132,33 @@ const ModalSetting = (props: IProps) => {
       notifyError(res?.message);
     }
   };
+
+  const handleLeave = async () => {
+    const res = await sendRequest<IBackendRes<IChat>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/chats/leave/${selectedChat?._id}`,
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
+
+    if (res && res?.data) {
+      await sendRequest<IBackendRes<any>>({
+        url: `/api/revalidate`,
+        method: "GET",
+        queryParams: {
+          tag: "access-chat",
+          secret: "truongdo",
+        },
+      });
+      router.refresh();
+      notifySuccess("Leave group chat successfully");
+      setSelectedChat(null);
+      handleClose();
+    } else {
+      notifyError(res?.message);
+    }
+  };
   return (
     <>
       <Modal open={openModalSetting} onClose={handleClose}>
@@ -179,7 +208,7 @@ const ModalSetting = (props: IProps) => {
               alignItems: "center",
               height: "200px",
               paddingTop: "50px",
-              overflow: "auto"
+              overflow: "auto",
             }}
           >
             {selectedChat?.users.map((user: IUser, index: number) => {
@@ -205,11 +234,19 @@ const ModalSetting = (props: IProps) => {
               );
             })}
           </List>
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{ float: "right", marginTop: "20px" }}
+            onClick={handleLeave}
+          >
+            <ExitToAppIcon /> Leave
+          </Button>
           {checked?.length > 0 && (
             <Button
               variant="outlined"
               color="error"
-              sx={{ float: "right", marginTop: "20px" }}
+              sx={{ float: "left", marginTop: "20px" }}
               onClick={handleRemove}
             >
               <DeleteIcon /> Remove

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Card, TextField, useMediaQuery } from "@mui/material";
+import { Card, TextField } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -98,7 +98,7 @@ const MyChats = (props: IProps) => {
   return (
     <>
       <Card
-        sx={{ flex: 1, background: "white", minHeight: "calc(100vh - 150px)" }}
+        sx={{ flex: 1, background: "white", minHeight: "calc(100vh - 150px)"}}
         className="mychats"
       >
         <Box
@@ -118,7 +118,7 @@ const MyChats = (props: IProps) => {
           </Button>
         </Box>
 
-        <List sx={{ width: "100%", overflow: "auto", height: "50vh" }}>
+        <List sx={{ width: "100%", overflow: "auto", height: "60vh" }}>
           {chats?.map((chat: any) => (
             <ListItem
               alignItems="flex-start"

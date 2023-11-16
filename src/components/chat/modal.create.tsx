@@ -65,6 +65,7 @@ const ModalCreateGroup = (props: IProps) => {
 
   const handleClose = () => {
     setOpenModal(false);
+    setSelectedUser([]);
   };
 
   const getUserById = (userId: string) => {
@@ -115,6 +116,7 @@ const ModalCreateGroup = (props: IProps) => {
       router.refresh();
       setChats([res.data, ...chats]);
       setSelectedChat(res.data);
+      setSelectedUser([]);
       handleClose();
       notifySuccess("Create a group chat successfully");
     } else {

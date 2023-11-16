@@ -17,6 +17,7 @@ import { notifyError, notifySuccess } from "@/app/logic/logic";
 import { useChatContext } from "@/app/lib/chat.context";
 import { Menu, MenuItem, Modal, styled } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import Link from "next/link";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -419,9 +420,11 @@ const ProfileDashboard = (props: IProps) => {
                 }}
               >
                 <RssFeedIcon />
-                <Typography sx={{ fontSize: "12px", margin: "5px 0" }}>
-                  {user?.followers.length} followers
-                </Typography>
+                <Link href={"/follow"}>
+                  <Typography sx={{ fontSize: "12px", margin: "5px 0" }}>
+                    {user?.followers.length} followers
+                  </Typography>
+                </Link>
               </Box>
             </Box>
           </Box>

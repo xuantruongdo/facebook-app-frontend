@@ -54,7 +54,8 @@ interface IProps {
 const RightBar = (props: IProps) => {
   const { open, setOpen } = props;
   const { data: session } = useSession();
-  const { onlineUsers, setOnlineUsers } = useUserContext() as IUserContext;
+  const { socket, setSocket, onlineUsers, setOnlineUsers } =
+    useUserContext() as IUserContext;
   const { chats, setChats, selectedChat, setSelectedChat } =
     useChatContext() as IChatContext;
   const router = useRouter();
@@ -79,7 +80,7 @@ const RightBar = (props: IProps) => {
   }, [onlineUsers]);
 
   const handleAccess = async (receivedId: string) => {
-    const res = await sendRequest<IBackendRes<IChat[]>>({
+    const res = await sendRequest<IBackendRes<IChat>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/chats`,
       method: "POST",
       headers: {
@@ -90,8 +91,9 @@ const RightBar = (props: IProps) => {
 
     if (res && res.data) {
       router.refresh();
-      router.push("/chat");
       setSelectedChat(res.data);
+      socket?.emit("joinRoom", res.data._id);
+      router.push("/chat");
       if (setOpen) {
         setOpen(false);
       }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useHasMounted } from '@/utils/customHook';
 import { useSession } from 'next-auth/react';
 import React, { createContext, useContext, useState } from 'react';
 import io, { Socket } from "socket.io-client";
@@ -11,9 +12,11 @@ const UserContext = createContext<IUserContext | null>(null);
 export const UserContextProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: session } = useSession();
   const [socket, setSocket] = React.useState<Socket>();
+  const hasMounted = useHasMounted();
 
     React.useEffect(() => {
-        const newSocket = io(ENDPOINT);
+      const newSocket = io(ENDPOINT);
+      if (!hasMounted) return;
         setSocket(newSocket);
     
         return () => {
@@ -30,6 +33,7 @@ export const UserContextProvider = ({ children }: { children: React.ReactNode })
       const newSocket = io(ENDPOINT, {
         query: { userId: session?.user._id },
       });
+      if (!hasMounted) return;
       setSocket(newSocket);
 
       return () => {
