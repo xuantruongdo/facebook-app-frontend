@@ -44,13 +44,13 @@ interface IProps {
 const TabsFollow = (props: IProps) => {
   const { user } = props;
   const [value, setValue] = React.useState(0);
-  const isMobileScreen = useMediaQuery("(max-width:900px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   return (
-    <Box sx={{ width: `${isMobileScreen ? "90vw" : "40vw"}`, backgroundColor: "White", borderRadius: "5px" }}>
+    <Box sx={{ width: `${isScreen900 ? "90vw" : "40vw"}`, backgroundColor: "White", borderRadius: "5px" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}

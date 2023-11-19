@@ -11,13 +11,12 @@ interface IProps {
 const ChatMain = (props: IProps) => {
   const { myChats } = props;
   const [open, setOpen] = React.useState<boolean>(false);
-  const isSmallScreen = useMediaQuery("(max-width:900px)");
-
-  const isMobileScreen = useMediaQuery("(max-width:600px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
   return (
     <>
-      <Box sx={{ margin: `${isMobileScreen ? "0 5px 10px" : "0 50px 20px"}` }}>
-        {isSmallScreen && (
+      <Box sx={{ margin: `${isScreen600 ? "0 5px 10px" : "0 50px 20px"}` }}>
+        {isScreen900 && (
           <Button variant="contained" onClick={() => setOpen(true)}>
             Conversations
           </Button>
@@ -27,15 +26,15 @@ const ChatMain = (props: IProps) => {
         sx={{
           display: "flex",
           gap: "50px",
-          margin: `${isMobileScreen ? "0 10px" : "0 50px"}`,
+          margin: `${isScreen600 ? "0 10px" : "0 50px"}`,
         }}
       >
-        {!isSmallScreen && <MyChats myChats={myChats} />}
+        {!isScreen900 && <MyChats myChats={myChats} />}
 
         <ChatBox />
       </Box>
 
-      {isSmallScreen && (
+      {isScreen900 && (
         <Drawer open={open} onClose={() => setOpen(false)} anchor="right">
           <Box sx={{ width: "350px", overflow: "auto" }}>
             <Button onClick={() => setOpen(false)}>

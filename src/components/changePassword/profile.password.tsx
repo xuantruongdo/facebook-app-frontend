@@ -21,7 +21,7 @@ const ChangPassword = () => {
   const [newPassword, setNewPassword] = React.useState<string>("");
   const [confirmPassword, setConfirmPassword] = React.useState<string>("");
 
-  const isMobileScreen = useMediaQuery("(max-width:600px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -52,7 +52,7 @@ const ChangPassword = () => {
     }
   };
   return (
-    <Card sx={{ width: `${isMobileScreen ? "80vw" : "40vw"}`, backgroundColor: "white" }}>
+    <Card sx={{ width: `${isScreen600 ? "80vw" : "40vw"}`, backgroundColor: "white" }}>
       <Container>
         <Typography
           sx={{

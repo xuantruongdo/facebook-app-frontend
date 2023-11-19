@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useUserContext } from "@/app/lib/user.context";
 import { notifyError, notifySuccess } from "@/app/logic/logic";
 import { useChatContext } from "@/app/lib/chat.context";
-import { Menu, MenuItem, Modal, styled } from "@mui/material";
+import { Menu, MenuItem, Modal, styled, useMediaQuery } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Link from "next/link";
 
@@ -50,6 +50,7 @@ interface IProps {
 const ProfileDashboard = (props: IProps) => {
   const { user } = props;
   const { data: session } = useSession();
+  const isScreen900 = useMediaQuery("(max-width:900px)");
   const [currentUser, setCurrentUser] = React.useState<IUser>();
   const inputRefAvatar = React.useRef<HTMLInputElement>(null);
   const inputRefCover = React.useRef<HTMLInputElement>(null);
@@ -431,7 +432,7 @@ const ProfileDashboard = (props: IProps) => {
 
           {session?.user?._id !== user?._id && (
             <Box>
-              <Box className="button-wrapper">
+              <Box sx={{ display: isScreen900 ? "none" : "block" }}>
                 {currentUser?.followings?.some((u) => u._id === user?._id) ? (
                   <Button
                     variant="outlined"
@@ -473,9 +474,8 @@ const ProfileDashboard = (props: IProps) => {
               </Box>
 
               <Button
-                className="expand-btn"
                 variant="outlined"
-                sx={{ display: "none" }}
+                sx={{ display: isScreen900 ? "block" : "none" }}
                 onClick={(e) => handleOpen(e)}
               >
                 ...

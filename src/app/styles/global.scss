@@ -26,23 +26,8 @@ a {
   background-color: #fafafa;
   color: #bdbdbd;
 }
-.drawer-header {
-  display: none;
-}
-.menu-btn {
-  display: none;
-}
-.tabs-profile {
-  display: none;
-}
 
 @media (max-width: 1024px) {
-  .modal-pic {
-    width: 90%;
-  }
-  .modal-post {
-    width: 60%;
-  }
   .modal-chat{
     width: 70%;
   }
@@ -64,24 +49,6 @@ a {
   .profile-wrapper {
     gap: 0;
   }
-  .button-wrapper {
-    display: none;
-  }
-  .expand-btn {
-    display: block;
-  }
-  .modal-pic {
-    top: "30%";
-  }
-  .drawer-header {
-    display: block;
-  }
-  .menu-btn {
-    display: block;
-  }
-  .tabs-profile {
-    display: block;
-  }
 
   .modal-chat{
     width: 80%;
@@ -92,13 +59,6 @@ a {
 @media (max-width: 600px) {
   .home-container {
     margin: 0 10px;
-  }
-  .modal-pic {
-    max-height: 80%;
-    top: 50%;
-  }
-  .modal-post {
-    width: 90%;
   }
   .modal-chat{
     width: 90%;

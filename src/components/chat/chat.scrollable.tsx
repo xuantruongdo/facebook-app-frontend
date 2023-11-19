@@ -13,7 +13,7 @@ interface IProps {
 const ScrollableChat = (props: IProps) => {
   const { messages } = props;
   const { data: session } = useSession();
-  const isMobileScreen = useMediaQuery("(max-width:600px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
   return (
     <ScrollableFeed>
       <Box sx={{ marginTop: "20px" }}>
@@ -55,7 +55,7 @@ const ScrollableChat = (props: IProps) => {
                     }`,
                     borderRadius: "20px",
                     padding: "5px 15px",
-                    maxWidth: `${isMobileScreen ? "200px" : "400px"}`,
+                    maxWidth: `${isScreen600 ? "200px" : "400px"}`,
                     marginTop: "5px",
                   }}
                 >

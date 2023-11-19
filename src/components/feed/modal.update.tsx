@@ -15,7 +15,7 @@ import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { isValidContent, notifyError, notifySuccess } from "@/app/logic/logic";
-import { Skeleton } from "@mui/material";
+import { Skeleton, useMediaQuery } from "@mui/material";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -29,18 +29,6 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const style = {
-  position: "absolute" as "absolute",
-  top: "40%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "40%",
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-  borderRadius: "5px",
-  outline: "none",
-};
 
 interface IProps {
   openModalUpdate: boolean;
@@ -49,6 +37,25 @@ interface IProps {
   setPostView: (v: IPost) => void;
 }
 const ModalUpdate = (props: IProps) => {
+  const isScreenMin900 = useMediaQuery("(min-width:900px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
+  const isScreen400 = useMediaQuery("(max-width:600px)");
+  const style = {
+    position: "absolute" as "absolute",
+    top: "40%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: isScreen400 ? "90%" : isScreen600 ? "80%" : isScreen900 ? "80%" : isScreenMin900 ? "40%" : "",
+    height: "60%",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    overflow: "auto",
+    p: 4,
+    borderRadius: "5px",
+    outline: "none",
+  };
+
   const { data: session } = useSession();
   const { openModalUpdate, setOpenModalUpdate, postView, setPostView } = props;
   const [content, setContent] = React.useState<string>(postView?.content || "");
@@ -126,23 +133,21 @@ const ModalUpdate = (props: IProps) => {
     <Box
       sx={{
         width: "100%",
-        height: "400px",
+        height: "max-content",
         position: "relative",
       }}
     >
       <img
         src={src}
         alt="image"
-        style={{ width: "100%", height: "400px", objectFit: "contain" }}
+        style={{ width: "100%", height: "270px", objectFit: "contain" }}
       />
       <Button
-        variant="contained"
         sx={{
           position: "absolute",
           top: "0",
           right: "0",
           fontWeight: "bold",
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
         }}
         onClick={() => {
           setIsChangeImage(true);

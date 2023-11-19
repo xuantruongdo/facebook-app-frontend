@@ -38,13 +38,10 @@ export async function generateMetadata(
     openGraph: {
       title: res?.data?.name,
       type: "website",
-      images: [
-        res?.data?.avatar!,
-      ],
+      images: [res?.data?.avatar!],
     },
   };
 }
-
 
 const ProfilePage = async (props: any) => {
   const session = await getServerSession(authOptions);
@@ -93,7 +90,6 @@ const ProfilePage = async (props: any) => {
           </Grid>
           <Grid item xs={12} md={8}>
             {session?.user?._id === id && <Post />}
-
             <Feed posts={posts?.data!} />
           </Grid>
         </Grid>

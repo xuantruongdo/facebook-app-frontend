@@ -33,7 +33,7 @@ import { useRouter } from "next/navigation";
 import { convertSlugUrl, sendRequest } from "@/utils/api";
 import List from "@mui/material/List";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
-import { Button, Drawer, ListItemSecondaryAction, Paper } from "@mui/material";
+import { Button, Drawer, ListItemSecondaryAction, Paper, useMediaQuery } from "@mui/material";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { useUserContext } from "@/app/lib/user.context";
 import { useHasMounted } from "@/utils/customHook";
@@ -93,6 +93,7 @@ export default function AppHeader() {
     useUserContext() as IUserContext;
   const [resultSearch, setResultSearch] = React.useState<IUser[]>([]);
   const router = useRouter();
+  const isScreen900 = useMediaQuery("(max-width:900px)");
 
   if (session && session.error === "RefreshAccessTokenError") {
     // Session đã được kiểm tra và có lỗi, thực hiện xử lý tại đây
@@ -437,9 +438,8 @@ export default function AppHeader() {
               edge="start"
               color="inherit"
               aria-label="open drawer"
-              sx={{ mr: 2 }}
+              sx={{ mr: 2, display: isScreen900 ? "block" : "none" }}
               onClick={() => setOpen(true)}
-              className="menu-btn"
             >
               <MenuIcon />
             </IconButton>

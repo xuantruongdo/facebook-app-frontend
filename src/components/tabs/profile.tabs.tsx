@@ -6,6 +6,7 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Info from "../sidebar/info.sidebar";
 import Photo from "../sidebar/photo.sidebar";
+import { useMediaQuery } from "@mui/material";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -48,12 +49,13 @@ interface IProps{
 const TabsProfile = (props: IProps) => {
     const { user, posts } = props;
   const [value, setValue] = React.useState(0);
-
+    const isScreen900 = useMediaQuery("(max-width:900px)");
+  
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
   return (
-    <Box sx={{ width: "100%", backgroundColor: "white", marginTop: "20px" }} className="tabs-profile">
+    <Box sx={{ width: "100%", backgroundColor: "white", marginTop: "20px", display: isScreen900 ? "block" : "none" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}

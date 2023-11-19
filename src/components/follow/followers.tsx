@@ -24,7 +24,7 @@ const Followers = (props: IProps) => {
   const { data: session } = useSession();
   const router = useRouter();
   const { socket, setSocket } = useUserContext() as IUserContext;
-  const isMobileScreen = useMediaQuery("(max-width:400px)");
+  const isScreen400 = useMediaQuery("(max-width:400px)");
 
   const handleFollow = async (user: IUser, isFollow: boolean) => {
     const res = await sendRequest<IBackendRes<IUser>>({
@@ -77,7 +77,7 @@ const Followers = (props: IProps) => {
                   )
                 }
               >
-                <RemoveIcon /> {isMobileScreen ? "": "Unfollow"}
+                <RemoveIcon /> {isScreen400 ? "": "Unfollow"}
               </Button>
             ) : (
               <Button
@@ -90,7 +90,7 @@ const Followers = (props: IProps) => {
                   )
                 }
               >
-                <AddIcon /> {isMobileScreen ? "": "Follow"}
+                <AddIcon /> {isScreen400 ? "": "Follow"}
               </Button>
             )}
           </ListItemButton>

@@ -22,21 +22,6 @@ import { isValidContent, notifyError } from "@/app/logic/logic";
 import { useMediaQuery } from "@mui/material";
 dayjs.extend(relativeTime);
 
-const style = {
-  position: "absolute" as "absolute",
-  top: "40%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "60%",
-  maxHeight: "60%",
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  overflow: "auto",
-  p: 4,
-  borderRadius: "5px",
-  outline: "none",
-};
-
 interface IProps {
   open: boolean;
   setOpen: (v: boolean) => void;
@@ -46,12 +31,30 @@ interface IProps {
 }
 
 const ModalFeed = (props: IProps) => {
+  const isScreenMin900 = useMediaQuery("(min-width:900px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
+  const isScreen400 = useMediaQuery("(max-width:600px)");
+  const style = {
+    position: "absolute" as "absolute",
+    top: "40%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: isScreen400 ? "90%" : isScreen600 ? "80%" : isScreen900 ? "80%" : isScreenMin900 ? "60%" : "",
+    maxHeight: "60%",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    overflow: "auto",
+    p: 4,
+    borderRadius: "5px",
+    outline: "none",
+  };
+
   const { data: session } = useSession();
   const { open, setOpen, postView, setPostView, openView } = props;
   const router = useRouter();
   const [content, setContent] = React.useState<string>("");
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const isMobileScreen = useMediaQuery("(max-width:600px)");
   const { socket, setSocket } = useUserContext() as IUserContext;
 
   const handleClose = () => setOpen(false);
@@ -118,7 +121,7 @@ const ModalFeed = (props: IProps) => {
 
   return (
     <Modal open={open} onClose={handleClose} sx={{ '& .MuiBackdrop-root': { backgroundColor: 'rgba(0, 0, 0, 0.1)' } }}>
-      <Box sx={style} className="modal-pic">
+      <Box sx={style}>
         <Box>
           <Grid container spacing={4}>
             <Grid
@@ -135,8 +138,8 @@ const ModalFeed = (props: IProps) => {
                   src={postView?.image}
                   alt="pic"
                   style={{
-                    maxWidth: "100%",
-                    maxHeight: `${isMobileScreen ? "188px" : "500px"}`,
+                    width: "100%",
+                    maxHeight: `${isScreen600 ? "188px" : "500px"}`,
                     objectFit: "contain",
                   }}
                 />
