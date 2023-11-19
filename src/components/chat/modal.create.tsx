@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Box, Button, Divider, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, TextField, Typography, useMediaQuery } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import MenuItem from "@mui/material/MenuItem";
@@ -13,21 +13,6 @@ import { sendRequest } from "@/utils/api";
 import { useChatContext } from "@/app/lib/chat.context";
 import { useRouter } from "next/navigation";
 import { notifyError, notifySuccess } from "@/app/logic/logic";
-
-const style = {
-  position: "absolute" as "absolute",
-  top: "40%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  maxHeight: "60%",
-  width: "50%",
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  overflow: "hidden",
-  p: 4,
-  borderRadius: "5px",
-  outline: "none",
-};
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -54,6 +39,26 @@ interface IProps {
   setOpenModal: (v: boolean) => void;
 }
 const ModalCreateGroup = (props: IProps) => {
+  const isScreenMin900 = useMediaQuery("(min-width:900px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
+  const isScreen400 = useMediaQuery("(max-width:400px)");
+
+  const style = {
+    position: "absolute" as "absolute",
+    top: "40%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    maxHeight: "60%",
+    width: isScreen400 ? "90%" : isScreen600 ? "80%" : isScreen900 ? "80%" : isScreenMin900 ? "40%" : "",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    overflow: "hidden",
+    p: 4,
+    borderRadius: "5px",
+    outline: "none",
+  };
+
   const { openModal, setOpenModal } = props;
   const { data: session } = useSession();
   const [chatName, setChatName] = React.useState<string>();
@@ -126,7 +131,7 @@ const ModalCreateGroup = (props: IProps) => {
 
   return (
     <Modal open={openModal} onClose={handleClose}>
-      <Box sx={style} className="modal-chat">
+      <Box sx={style}>
         <Typography
           sx={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}
         >

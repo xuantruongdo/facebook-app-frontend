@@ -82,8 +82,10 @@ const ProfilePage = async (props: any) => {
             display: "flex",
             flexWrap: "nowrap",
             gap: "50px",
+            "@media (max-width: 900px)": {
+              gap: 0,
+            },
           }}
-          className="profile-wrapper"
         >
           <Grid item xs={0} md={4}>
             <Sidebar user={res?.data!} posts={posts?.data!} />

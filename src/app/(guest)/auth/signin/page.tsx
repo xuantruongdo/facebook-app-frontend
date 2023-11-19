@@ -16,7 +16,6 @@ const SignInPage = async () => {
   if (session) {
       redirect("/");
   }
-
   return (
     <>
       <AuthSignIn />

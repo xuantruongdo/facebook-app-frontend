@@ -39,7 +39,7 @@ const LeftBar = (props: IProps) => {
             <ListItemIcon>
               <FeedIcon color="primary" />
             </ListItemIcon>
-            <ListItemText primary="Latest News" />
+            <ListItemText primary="News Feed" />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>

@@ -40,7 +40,7 @@ const ModalUpdate = (props: IProps) => {
   const isScreenMin900 = useMediaQuery("(min-width:900px)");
   const isScreen900 = useMediaQuery("(max-width:900px)");
   const isScreen600 = useMediaQuery("(max-width:600px)");
-  const isScreen400 = useMediaQuery("(max-width:600px)");
+  const isScreen400 = useMediaQuery("(max-width:400px)");
   const style = {
     position: "absolute" as "absolute",
     top: "40%",

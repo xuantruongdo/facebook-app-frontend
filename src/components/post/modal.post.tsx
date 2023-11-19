@@ -38,7 +38,7 @@ const ModalPost = (props: IProps) => {
   const isScreen900 = useMediaQuery("(max-width:900px)");
   const style = {
     position: "absolute" as "absolute",
-    top: isScreen400 ? "50%" : "40%",
+    top: isScreen400 ? "55%" : "40%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: isScreen400 ? "90%" : isScreen900 ? "80%" : "40%",

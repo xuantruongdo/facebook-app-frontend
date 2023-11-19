@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, useMediaQuery } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -17,13 +17,24 @@ import { useSession } from "next-auth/react";
 import { notifyError, notifySuccess } from "@/app/logic/logic";
 import { useRouter } from "next/navigation";
 
-const style = {
+interface IProps {
+  openModalAdd: boolean;
+  setOpenModalAdd: (v: boolean) => void;
+}
+
+const ModalAddMember = (props: IProps) => {
+  const isScreenMin900 = useMediaQuery("(min-width:900px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
+  const isScreen400 = useMediaQuery("(max-width:400px)");
+
+  const style = {
     position: "absolute" as "absolute",
     top: "40%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "50%",
-    height: "300px",
+    height: "60%",
+    width: isScreen400 ? "90%" : isScreen600 ? "80%" : isScreen900 ? "80%" : isScreenMin900 ? "40%" : "",
     bgcolor: "background.paper",
     boxShadow: 24,
     overflow: "hidden",
@@ -31,12 +42,7 @@ const style = {
     borderRadius: "5px",
     outline: "none",
   };
-interface IProps {
-  openModalAdd: boolean;
-  setOpenModalAdd: (v: boolean) => void;
-}
 
-const ModalAddMember = (props: IProps) => {
   const { openModalAdd, setOpenModalAdd } = props;
   const { data: session } = useSession();
   const [users, setUsers] = React.useState<IUser[]>([]);

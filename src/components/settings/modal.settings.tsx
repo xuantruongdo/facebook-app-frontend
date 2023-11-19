@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Modal, Box, Grid, TextField, Button } from "@mui/material";
+import { Modal, Box, Grid, TextField, Button, useMediaQuery } from "@mui/material";
 import { sendRequest } from "@/utils/api";
 import { notifyError, notifySuccess } from "@/app/logic/logic";
 import { useRouter } from "next/navigation";
@@ -26,6 +26,24 @@ interface IProps {
   user: IUser;
 }
 const ModalSetting = (props: IProps) => {
+  const isScreenMin900 = useMediaQuery("(min-width:900px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
+  const isScreen400 = useMediaQuery("(max-width:400px)");
+
+  const style = {
+    position: "absolute" as "absolute",
+    top: "40%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: isScreen400 ? "90%" : isScreen600 ? "80%" : isScreen900 ? "80%" : isScreenMin900 ? "40%" : "",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    borderRadius: "5px",
+    outline: "none",
+  };
+
   const { open, setOpen, user } = props;
   const { data: session } = useSession();
   const router = useRouter();
@@ -59,13 +77,14 @@ const ModalSetting = (props: IProps) => {
   };
   return (
     <Modal open={open} onClose={() => setOpen(false)}>
-      <Box sx={style} className="modal-chat">
+      <Box sx={style}>
         <Grid container spacing={2}>
           <Grid item md={6}>
             <TextField
               label="Note"
               variant="standard"
               defaultValue={user?.note}
+              fullWidth
               onChange={(e) => setNote(e.target.value)}
             />
           </Grid>
@@ -74,6 +93,7 @@ const ModalSetting = (props: IProps) => {
               label="Work"
               variant="standard"
               defaultValue={user?.work}
+              fullWidth
               onChange={(e) => setWork(e.target.value)}
             />
           </Grid>
@@ -82,6 +102,7 @@ const ModalSetting = (props: IProps) => {
               label="Live"
               variant="standard"
               defaultValue={user?.live}
+              fullWidth
               onChange={(e) => setLive(e.target.value)}
             />
           </Grid>
@@ -90,6 +111,7 @@ const ModalSetting = (props: IProps) => {
               label="From"
               variant="standard"
               defaultValue={user?.from}
+              fullWidth
               onChange={(e) => setFrom(e.target.value)}
             />
           </Grid>

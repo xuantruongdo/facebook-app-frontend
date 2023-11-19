@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Button, Card } from "@mui/material";
+import { Avatar, Button, Card, useMediaQuery } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -21,9 +21,11 @@ interface IProps {
 const Setting = (props: IProps) => {
   const { user } = props;
   const [open, setOpen] = useState<boolean>(false);
+  const isScreen600 = useMediaQuery("(max-width:600px)");
+
   return (
     <>
-      <Card sx={{ width: "50vw", backgroundColor: "white" }} className="modal-chat">
+      <Card sx={{ width: isScreen600 ? "95vw" : "50vw", backgroundColor: "white" }} className="modal-chat">
         <Button
           variant="contained"
           sx={{ margin: "20px" }}

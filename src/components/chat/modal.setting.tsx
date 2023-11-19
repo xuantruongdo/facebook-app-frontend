@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Box, Button, Divider, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, TextField, Typography, useMediaQuery } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -19,26 +19,31 @@ import { notifyError, notifySuccess } from "@/app/logic/logic";
 import ModalAddMember from "./modal.addmember";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
-const style = {
-  position: "absolute" as "absolute",
-  top: "40%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "50%",
-  height: "500px",
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  overflow: "hidden",
-  p: 4,
-  borderRadius: "5px",
-  outline: "none",
-};
-
 interface IProps {
   openModalSetting: boolean;
   setOpenModalSetting: (v: boolean) => void;
 }
 const ModalSetting = (props: IProps) => {
+  const isScreenMin900 = useMediaQuery("(min-width:900px)");
+  const isScreen900 = useMediaQuery("(max-width:900px)");
+  const isScreen600 = useMediaQuery("(max-width:600px)");
+  const isScreen400 = useMediaQuery("(max-width:400px)");
+
+  const style = {
+    position: "absolute" as "absolute",
+    top: "40%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    height: "max-content",
+    width: isScreen400 ? "90%" : isScreen600 ? "80%" : isScreen900 ? "80%" : isScreenMin900 ? "40%" : "",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    overflow: "hidden",
+    p: 4,
+    borderRadius: "5px",
+    outline: "none",
+  };
+
   const { openModalSetting, setOpenModalSetting } = props;
   const { data: session } = useSession();
 

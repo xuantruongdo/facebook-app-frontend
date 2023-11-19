@@ -469,7 +469,7 @@ export default function AppHeader() {
                   sx={{
                     position: "absolute",
                     backgroundColor: "white",
-                    height: "max-height",
+                    height: "max-content",
                     top: "50px",
                     bottom: 0,
                     left: 0,

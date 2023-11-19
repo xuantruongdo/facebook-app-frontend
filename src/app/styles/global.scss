@@ -27,12 +27,6 @@ a {
   color: #bdbdbd;
 }
 
-@media (max-width: 1024px) {
-  .modal-chat{
-    width: 70%;
-  }
-}
-
 @media (max-width: 900px) {
   .left-bar {
     display: none;
@@ -40,27 +34,8 @@ a {
   .right-bar {
     display: none;
   }
-  .home-container {
-    margin: 0 10px;
-  }
   .sidebar {
     display: none;
   }
-  .profile-wrapper {
-    gap: 0;
-  }
 
-  .modal-chat{
-    width: 80%;
-  }
-
-}
-
-@media (max-width: 600px) {
-  .home-container {
-    margin: 0 10px;
-  }
-  .modal-chat{
-    width: 90%;
-  }
 }
