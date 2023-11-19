@@ -15,6 +15,7 @@ import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { isValidContent, notifyError, notifySuccess } from "@/app/logic/logic";
+import { Skeleton } from "@mui/material";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -50,11 +51,13 @@ const ModalPost = (props: IProps) => {
   const { open, setOpen } = props;
   const [content, setContent] = React.useState<string>("");
   const [pic, setPic] = React.useState<string>();
+  const [loading, setLoading] = React.useState<boolean>();
   const router = useRouter();
 
   const handleClose = () => setOpen(false);
 
   const handleUpload = (pics: any) => {
+    setLoading(true);
     //@ts-ignore
     if (
       pics.type === "image/jpeg" ||
@@ -71,9 +74,11 @@ const ModalPost = (props: IProps) => {
       })
         .then((res) => res.json())
         .then((data) => {
+          setLoading(false);
           setPic(data.url);
         })
         .catch((error) => {
+          setLoading(false);
           console.error("Lỗi khi gửi yêu cầu:", error);
         });
     }
@@ -116,6 +121,7 @@ const ModalPost = (props: IProps) => {
           Create a post
         </Typography>
         <Divider />
+
         <Box sx={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
           <Box width="50px">
             <img
@@ -164,13 +170,37 @@ const ModalPost = (props: IProps) => {
             onChange={(e) => setContent(e.target.value)}
           />
 
-          {pic ? (
-            <img
-              src={pic}
-              alt="pic"
-              style={{ width: "100%", height: "300px", objectFit: "cover" }}
-            />
-          ) : (
+          {pic && !loading && (
+            <Box
+              sx={{
+                width: "100%",
+                height: "400px",
+                position: "relative",
+              }}
+            >
+              <img
+                src={pic}
+                alt="pic"
+                style={{ width: "100%", height: "400px", objectFit: "contain" }}
+              />
+              <Button
+                variant="contained"
+                sx={{
+                  position: "absolute",
+                  top: "0",
+                  right: "0",
+                  fontWeight: "bold",
+                  backgroundColor: "rgba(0, 0, 0, 0.8)",
+                }}
+                onClick={() => {
+                  setPic(undefined);
+                }}
+              >
+                x
+              </Button>
+            </Box>
+          )}
+          {!pic && !loading && (
             <label
               htmlFor="fileInput"
               className="upload-container"
@@ -189,7 +219,13 @@ const ModalPost = (props: IProps) => {
               />
             </label>
           )}
-
+          {loading && (
+            <Skeleton
+              animation="wave"
+              height={400}
+              style={{ marginBottom: 6 }}
+            />
+          )}
           <Button
             variant="contained"
             sx={{ float: "right", marginTop: "20px" }}

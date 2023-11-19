@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import React, { createContext, useContext, useState } from 'react';
 import io, { Socket } from "socket.io-client";
 
-const ENDPOINT = "http://localhost:8002"
+const ENDPOINT = "https://truongdo-facenet-backend.onrender.com"
 
 const UserContext = createContext<IUserContext | null>(null);
 

@@ -15,6 +15,7 @@ import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { isValidContent, notifyError, notifySuccess } from "@/app/logic/logic";
+import { Skeleton } from "@mui/material";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -50,9 +51,10 @@ interface IProps {
 const ModalUpdate = (props: IProps) => {
   const { data: session } = useSession();
   const { openModalUpdate, setOpenModalUpdate, postView, setPostView } = props;
-  const [content, setContent] = React.useState<string>("");
+  const [content, setContent] = React.useState<string>(postView?.content || "");
   const [pic, setPic] = React.useState<string>();
   const [isChangeImage, setIsChangeImage] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>();
   const router = useRouter();
 
   const handleClose = () => {
@@ -62,6 +64,7 @@ const ModalUpdate = (props: IProps) => {
   };
 
   const handleUpload = (pics: any) => {
+    setLoading(true);
     //@ts-ignore
     if (
       pics.type === "image/jpeg" ||
@@ -78,9 +81,11 @@ const ModalUpdate = (props: IProps) => {
       })
         .then((res) => res.json())
         .then((data) => {
+          setLoading(false);
           setPic(data.url);
         })
         .catch((error) => {
+          setLoading(false);
           console.error("Lỗi khi gửi yêu cầu:", error);
         });
     }
@@ -121,15 +126,14 @@ const ModalUpdate = (props: IProps) => {
     <Box
       sx={{
         width: "100%",
-        height: "300px",
-        objectFit: "cover",
+        height: "400px",
         position: "relative",
       }}
     >
       <img
         src={src}
         alt="image"
-        style={{ width: "100%", height: "300px", objectFit: "cover" }}
+        style={{ width: "100%", height: "400px", objectFit: "contain" }}
       />
       <Button
         variant="contained"
@@ -169,6 +173,10 @@ const ModalUpdate = (props: IProps) => {
       />
     </label>
   );
+
+  React.useEffect(() => {
+    setContent(postView?.content || "");
+  }, [postView]);
 
   return (
     <Modal open={openModalUpdate} onClose={handleClose}>
@@ -226,7 +234,7 @@ const ModalUpdate = (props: IProps) => {
             placeholder={`What's on your mind, ${session?.user?.name} ?`}
             fullWidth
             sx={{ margin: "20px 0" }}
-            defaultValue={postView?.content}
+            value={content}
             onChange={(e) => setContent(e.target.value)}
           />
 
@@ -235,10 +243,17 @@ const ModalUpdate = (props: IProps) => {
             postView?.image &&
             renderImageBox(postView?.image)}
 
-          {isChangeImage && !pic && renderUploadLabel()}
+          {isChangeImage && !pic && !loading && renderUploadLabel()}
 
           {isChangeImage && pic && renderImageBox(pic)}
 
+          {loading && (
+            <Skeleton
+              animation="wave"
+              height={400}
+              style={{ marginBottom: 6 }}
+            />
+          )}
           <Button
             variant="contained"
             sx={{ float: "right", marginTop: "20px" }}
