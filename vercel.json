@@ -1,0 +1,11 @@
+{
+    "version": 2,
+    "builds": [{ "src": "next.config.js", "use": "@vercel/node" }],
+    "functions": {
+      "yourFunctionName": {
+        "maxDuration": 60
+      }
+    },
+    "routes": [{ "src": "/(.*)", "dest": "/" }]
+  }
+  

@@ -90,12 +90,10 @@ const Info = (props: IProps) => {
               <ListItemIcon>
                 <RssFeedIcon />
               </ListItemIcon>
-              <Link href={"/follow"}>
-                <ListItemText
-                  style={{ color: "#696969" }}
-                  primary={`${user?.followings.length} followings`}
-                />
-              </Link>
+              <ListItemText
+                style={{ color: "#696969" }}
+                primary={`${user?.followings.length} followings`}
+              />
             </ListItem>
           )}
         </List>

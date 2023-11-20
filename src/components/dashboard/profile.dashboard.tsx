@@ -421,11 +421,17 @@ const ProfileDashboard = (props: IProps) => {
                 }}
               >
                 <RssFeedIcon />
-                <Link href={"/follow"}>
+                {session?.user?._id === user?._id ? (
+                  <Link href={"/follow"}>
+                    <Typography sx={{ fontSize: "12px", margin: "5px 0" }}>
+                      {user?.followers.length} followers
+                    </Typography>
+                  </Link>
+                ) : (
                   <Typography sx={{ fontSize: "12px", margin: "5px 0" }}>
                     {user?.followers.length} followers
                   </Typography>
-                </Link>
+                )}
               </Box>
             </Box>
           </Box>

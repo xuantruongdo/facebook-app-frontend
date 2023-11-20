@@ -33,7 +33,7 @@ const ModalAddMember = (props: IProps) => {
     top: "40%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    height: "60%",
+    height: "max-content",
     width: isScreen400 ? "90%" : isScreen600 ? "80%" : isScreen900 ? "80%" : isScreenMin900 ? "40%" : "",
     bgcolor: "background.paper",
     boxShadow: 24,
