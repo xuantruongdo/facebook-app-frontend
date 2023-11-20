@@ -33,7 +33,13 @@ import { useRouter } from "next/navigation";
 import { convertSlugUrl, sendRequest } from "@/utils/api";
 import List from "@mui/material/List";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
-import { Button, Drawer, ListItemSecondaryAction, Paper, useMediaQuery } from "@mui/material";
+import {
+  Button,
+  Drawer,
+  ListItemSecondaryAction,
+  Paper,
+  useMediaQuery,
+} from "@mui/material";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { useUserContext } from "@/app/lib/user.context";
 import { useHasMounted } from "@/utils/customHook";
@@ -427,6 +433,32 @@ export default function AppHeader() {
       setResultSearch([]);
     }
   };
+
+  const handleFixSleep = async () => {
+    try {
+      const res = await sendRequest<IBackendRes<any>>({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth`,
+        method: "GET",
+      });
+      console.log(res);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  
+  React.useEffect(() => {
+    // Fetch data on component mount
+    handleFixSleep();
+  
+    // Set up interval to fetch data every 5 seconds
+    const intervalId = setInterval(() => {
+      handleFixSleep();
+    }, 3 * 60 * 1000); // 3p
+  
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+  
 
   return (
     <>
